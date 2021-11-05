@@ -12,3 +12,6 @@ environment:
 
 dev_dependencies:
   lints: ^1.0.0
+dependencies: 
+  shelf_plus: ^1.0.0
+  shelf_router: ^1.1.2
