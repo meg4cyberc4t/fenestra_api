@@ -5,7 +5,7 @@ import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import '../middleware.dart';
+import 'middleware.dart';
 
 import '../structs/reponse.dart';
 import '../structs/user.dart';

@@ -1,4 +1,5 @@
 build:
+	dart pub get
 	docker-compose build
 	docker-compose up
 

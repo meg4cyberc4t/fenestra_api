@@ -6,21 +6,49 @@ import 'package:postgres/postgres.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'handlers/listshandlers.dart';
+import 'handlers/middleware.dart';
 import 'structs/error.dart';
 import 'handlers/authhandlers.dart';
 import 'repository.dart';
 
 class Service {
   Service(this.repos);
-
   final Repository repos;
 
   Handler get handlers {
     final router = Router();
-    final Map<String, String> defaultHeaders = {
-      "Content-Type": 'application/json'
-    };
-    router.mount('/auth/', AuthHandlers(repos, defaultHeaders).router);
+    Map<String, String> defaultHeaders = {"Content-Type": 'application/json'};
+
+    router.mount(
+        '/auth/',
+        Pipeline()
+            .addMiddleware(createMiddleware(
+              responseHandler: (Response response) =>
+                  response.change(headers: defaultHeaders),
+            ))
+            .addHandler(AuthHandlers(repos, defaultHeaders).router));
+    router.mount(
+        '/lists/',
+        Pipeline()
+            .addMiddleware(createMiddleware(
+              responseHandler: (Response response) =>
+                  response.change(headers: defaultHeaders),
+            ))
+            .addMiddleware(handleAuth(secretServerKey))
+            .addHandler(ListsHandlers(repos, defaultHeaders).router));
+
+    // try {
+    //     ApiErrorStruct? error = checkJWTtoken(getTokenFromRequest(request));
+    //     if (error != null) {
+    //       return Response.ok(jsonEncode(error.toMap()),
+    //           headers: defaultHeaders);
+    //     }
+    //   } catch (e) {
+    //     return Response.ok(jsonEncode(ApiError.unauthorized.toMap()),
+    //         headers: defaultHeaders);
+    //   }
+    //ListsHandlers(repos, defaultHeaders).router
 
     router.all(
       '/<ignored|.*>',
