@@ -2,7 +2,7 @@
 
 ## Information for developers
 
-## Steps for launch
+### Steps for launch
 
 - make build (Start postgres database on port 5432)
 - make migrate_up (Apply migrations)
