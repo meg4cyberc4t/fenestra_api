@@ -26,7 +26,6 @@ CREATE TABLE notification_lists
     title varchar(255) not null,
     description varchar(255) not null,
     public boolean not null
-
 );
 
 CREATE TABLE notification_items
@@ -36,8 +35,8 @@ CREATE TABLE notification_items
     title varchar(255) not null,
     description varchar(255),
     deadline integer,
-    owner_id integer not null
-
+    owner_id integer not null,
+    repeat boolean not null
 );
 
 CREATE TABLE refresh_tokens

@@ -1,5 +1,5 @@
 import '../structs/error.dart';
-import '../repository.dart';
+import '../repository/repository.dart';
 
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
@@ -24,28 +24,22 @@ class AuthHandlers {
         dynamic input = jsonDecode(await request.readAsString());
         selectUser = User.fromJson(json: input, id: -1);
       } catch (e) {
-        return Response.ok(jsonEncode(ApiError.badArguments.toMap()),
-            headers: defaultHeaders);
+        return Response.ok(jsonEncode(ApiError.badArguments.toMap()));
       }
-
       selectUser.passwordHash =
           md5.convert(utf8.encode(selectUser.passwordHash)).toString();
-
       if (!await repos.checkUniqueLogin(selectUser.login)) {
-        return Response.ok(jsonEncode(ApiError.notUniqueValue.toMap()),
-            headers: defaultHeaders);
+        return Response.ok(jsonEncode(ApiError.notUniqueValue.toMap()));
       }
       await repos.addNewUser(selectUser);
       String authToken = generateAuthToken(selectUser);
       String refreshToken = generateRefreshToken(selectUser);
       repos.writeRefreshToken(selectUser, refreshToken);
-      return Response.ok(
-          jsonEncode(ApiResponse({
-            'id': selectUser.id,
-            'authToken': authToken,
-            'refreshToken': refreshToken,
-          }).toMap()),
-          headers: defaultHeaders);
+      return Response.ok(jsonEncode(ApiResponse({
+        'id': selectUser.id,
+        'authToken': authToken,
+        'refreshToken': refreshToken,
+      }).toMap()));
     });
 
     router.post('/sign-in', (Request request) async {
@@ -54,32 +48,27 @@ class AuthHandlers {
         dynamic input = jsonDecode(await request.readAsString());
         selectUser = User.fromJson(json: input, id: -1, name: "");
       } catch (e) {
-        return Response.ok(jsonEncode(ApiError.badArguments.toMap()),
-            headers: defaultHeaders);
+        return Response.ok(jsonEncode(ApiError.badArguments.toMap()));
       }
       selectUser.passwordHash =
           md5.convert(utf8.encode(selectUser.passwordHash)).toString();
 
       if (await repos.checkUniqueLogin(selectUser.login)) {
-        return Response.ok(jsonEncode(ApiError.badArguments.toMap()),
-            headers: defaultHeaders);
+        return Response.ok(jsonEncode(ApiError.badArguments.toMap()));
       }
       selectUser.id = await repos.getIdByLogin(selectUser.login);
       if (selectUser.passwordHash !=
           await repos.getPasswordHashById(selectUser.id)) {
-        return Response.ok(jsonEncode(ApiError.badArguments.toMap()),
-            headers: defaultHeaders);
+        return Response.ok(jsonEncode(ApiError.badArguments.toMap()));
       }
       String authToken = generateAuthToken(selectUser);
       String refreshToken = generateRefreshToken(selectUser);
       repos.writeRefreshToken(selectUser, refreshToken);
-      return Response.ok(
-          jsonEncode(ApiResponse({
-            'id': selectUser.id,
-            'authToken': authToken,
-            'refreshToken': refreshToken,
-          }).toMap()),
-          headers: defaultHeaders);
+      return Response.ok(jsonEncode(ApiResponse({
+        'id': selectUser.id,
+        'authToken': authToken,
+        'refreshToken': refreshToken,
+      }).toMap()));
     });
 
     router.post('/reload-token', (Request request) async {
@@ -88,8 +77,7 @@ class AuthHandlers {
         dynamic input = jsonDecode(await request.readAsString());
         refreshToken = input['refreshToken'];
       } catch (e) {
-        return Response.ok(jsonEncode(ApiError.badArguments.toMap()),
-            headers: defaultHeaders);
+        return Response.ok(jsonEncode(ApiError.badArguments.toMap()));
       }
       late int refreshTokenId;
       late int ownerId;
@@ -106,14 +94,17 @@ class AuthHandlers {
       String newRefreshToken = generateRefreshToken(selectUser);
       repos.rewriteRefreshTokenByRefreshTokenId(
           newRefreshToken, refreshTokenId);
-      return Response.ok(
-          jsonEncode(ApiResponse({
-            'id': selectUser.id,
-            'authToken': authToken,
-            'refreshToken': refreshToken,
-          }).toMap()),
-          headers: defaultHeaders);
+      return Response.ok(jsonEncode(ApiResponse({
+        'id': selectUser.id,
+        'authToken': authToken,
+        'refreshToken': refreshToken,
+      }).toMap()));
     });
+
+    router.all(
+      '/<ignored|.*>',
+      (Request request) => Response.ok(jsonEncode(ApiError.notFound.toMap())),
+    );
 
     return router;
   }

@@ -50,7 +50,8 @@ Middleware handleAuth(String secret) {
         return await innerHandler(updatedRequest);
       } on JWTExpiredError {
         return Response.ok(jsonEncode(ApiError.tokenExpired.toMap()));
-      } catch (_) {
+      } catch (e) {
+        print(e);
         return Response.ok(jsonEncode(ApiError.unauthorized.toMap()));
       }
     };

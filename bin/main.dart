@@ -10,7 +10,7 @@ import 'handlers/listshandlers.dart';
 import 'handlers/middleware.dart';
 import 'structs/error.dart';
 import 'handlers/authhandlers.dart';
-import 'repository.dart';
+import 'repository/repository.dart';
 
 class Service {
   Service(this.repos);
@@ -28,6 +28,7 @@ class Service {
                   response.change(headers: defaultHeaders),
             ))
             .addHandler(AuthHandlers(repos, defaultHeaders).router));
+
     router.mount(
         '/lists/',
         Pipeline()
@@ -37,18 +38,6 @@ class Service {
             ))
             .addMiddleware(handleAuth(secretServerKey))
             .addHandler(ListsHandlers(repos, defaultHeaders).router));
-
-    // try {
-    //     ApiErrorStruct? error = checkJWTtoken(getTokenFromRequest(request));
-    //     if (error != null) {
-    //       return Response.ok(jsonEncode(error.toMap()),
-    //           headers: defaultHeaders);
-    //     }
-    //   } catch (e) {
-    //     return Response.ok(jsonEncode(ApiError.unauthorized.toMap()),
-    //         headers: defaultHeaders);
-    //   }
-    //ListsHandlers(repos, defaultHeaders).router
 
     router.all(
       '/<ignored|.*>',

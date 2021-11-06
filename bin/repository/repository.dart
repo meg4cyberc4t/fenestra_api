@@ -1,6 +1,7 @@
 import 'package:angel3_orm_postgres/angel3_orm_postgres.dart';
 
-import 'structs/user.dart';
+import '../structs/list.dart';
+import '../structs/user.dart';
 
 const tableUsers = 'users';
 const tableRefreshTokens = 'refresh_tokens';
@@ -31,13 +32,11 @@ class Repository {
   }
 
   Future<void> writeRefreshToken(User user, String refreshToken) async {
-    await executor.query(
-        tableRefreshTokens,
-        "INSERT INTO $tableRefreshTokens (owner_id, token) VALUES (@1, @2) RETURNING owner_id",
-        {
-          '1': user.id,
-          '2': refreshToken,
-        });
+    await executor.query(tableRefreshTokens,
+        "INSERT INTO $tableRefreshTokens (owner_id, token) VALUES (@1, @2)", {
+      '1': user.id,
+      '2': refreshToken,
+    });
   }
 
   Future<int> getIdByLogin(String login) async {
@@ -84,5 +83,63 @@ class Repository {
         name: rows[0][1],
         login: rows[0][2],
         passwordHash: rows[0][3]);
+  }
+
+  Future<void> createNotificationListByList(NotificationList list) async {
+    var rows = await executor.query(
+        tableNotificationList,
+        "INSERT INTO $tableNotificationList"
+        "(owner_id, moderator_ids, subscribers_ids, title, description, public)"
+        "VALUES (@1, ARRAY${list.moderatorIds}, ARRAY${list.subscribersIds}, @4, @5, @6) RETURNING id",
+        {
+          '1': list.ownerId,
+          '4': list.title,
+          '5': list.description,
+          '6': list.public,
+        });
+    list.id = rows[0][0];
+  }
+
+  Future<List<NotificationList>> getListsByUserId(int id) async {
+    var rows = await executor.query(
+        tableUsers,
+        'SELECT * FROM $tableNotificationList WHERE owner_id = @1 OR @1 = ANY(subscribers_ids)',
+        {'1': id});
+    List<NotificationList> lists = [];
+    for (var parseList in rows) {
+      if (parseList.isEmpty) {
+        continue;
+      }
+      lists.add(NotificationList(
+        id: parseList[0],
+        ownerId: parseList[1],
+        moderatorIds: parseList[2],
+        subscribersIds: parseList[3],
+        title: parseList[4],
+        description: parseList[5],
+        public: parseList[6],
+      ));
+    }
+    return lists;
+  }
+
+  Future<bool> getCheckRight(int userid, int listid) async {
+    // Возвращает true если права есть
+    List<List<dynamic>> rows = await executor.query(
+        tableNotificationList,
+        'SELECT id FROM $tableNotificationList WHERE owner_id = @1 OR @1 = ANY(subscribers_ids) AND id = @2',
+        {
+          '1': userid,
+          '2': listid,
+        });
+    return rows.isNotEmpty && rows[0].isNotEmpty;
+  }
+
+  Future<bool> deleteNotificationListById(int listid, int ownerid) async {
+    var data = await executor.query(
+        tableNotificationList,
+        'DELETE FROM $tableNotificationList WHERE id = @1 AND owner_id = @2 RETURNING id',
+        {'1': listid, '2': ownerid});
+    return data[0].isNotEmpty;
   }
 }
