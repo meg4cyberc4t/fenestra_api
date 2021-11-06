@@ -1,10 +1,10 @@
 name: notify_api
-description: A simple command-line application.
+description: RESTful API server written in dart. Works with JWT and Postgres. Implemented for synchronization of clients in the Notify project
 version: 1.0.0
-# homepage: https://www.example.com
+homepage: https://github.com/meg4cyberc4t/notify-api
 
 environment:
-  sdk: '>=2.15.0-268.0.dev <3.0.0'
+  sdk: '>=2.15.0-168.0.dev <3.0.0'
 
 
 # dependencies:
@@ -12,6 +12,7 @@ environment:
 
 dev_dependencies:
   lints: ^1.0.0
+
 dependencies: 
   shelf_router: ^1.1.2
   angel3_orm_postgres: ^3.1.0

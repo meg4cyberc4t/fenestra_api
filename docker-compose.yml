@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  db:
+    restart: always
+    image: postgres:latest
+    volumes:
+    - ./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=SUPERPASSWORD
+    ports:
+      - 5432:5432
