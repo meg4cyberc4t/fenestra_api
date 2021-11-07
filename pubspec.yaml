@@ -1,4 +1,4 @@
-name: notify_api
+name: notifyapi
 description: RESTful API server written in dart. Works with JWT and Postgres. Implemented for synchronization of clients in the Notify project
 version: 1.0.0
 homepage: https://github.com/meg4cyberc4t/notify-api

@@ -1,14 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:angel3_orm_postgres/angel3_orm_postgres.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'config.dart';
 import 'handlers/listshandlers.dart';
 import 'handlers/middleware.dart';
-import 'structs/error.dart';
 import 'handlers/authhandlers.dart';
 import 'repository/repository.dart';
 
@@ -27,6 +25,7 @@ class Service {
               responseHandler: (Response response) =>
                   response.change(headers: defaultHeaders),
             ))
+            .addMiddleware(handleErrors())
             .addHandler(AuthHandlers(repos, defaultHeaders).router));
 
     router.mount(
@@ -36,15 +35,13 @@ class Service {
               responseHandler: (Response response) =>
                   response.change(headers: defaultHeaders),
             ))
+            .addMiddleware(handleErrors())
             .addMiddleware(handleAuth(secretServerKey))
             .addHandler(ListsHandlers(repos, defaultHeaders).router));
 
     router.all(
       '/<ignored|.*>',
-      (Request request) {
-        return Response.ok(jsonEncode(ApiError.notFound.toMap()),
-            headers: defaultHeaders);
-      },
+      (Request request) => Response.notFound(null),
     );
     return router;
   }

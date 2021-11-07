@@ -1,0 +1,1 @@
+const secretServerKey = "ALOHAMORA";
