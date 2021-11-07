@@ -4,7 +4,7 @@ import 'package:postgres/postgres.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'config.dart';
+import 'configs/config.dart';
 import 'handlers/listshandlers.dart';
 import 'handlers/middleware.dart';
 import 'handlers/authhandlers.dart';

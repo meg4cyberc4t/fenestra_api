@@ -1,4 +1,4 @@
-import '../extensions/JWTmethods.dart';
+import '../extensions/jwtmethods.dart';
 import '../repository/repository.dart';
 
 import 'package:shelf_router/shelf_router.dart';

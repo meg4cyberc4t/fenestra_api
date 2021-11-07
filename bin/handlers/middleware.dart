@@ -1,4 +1,4 @@
-import '../config.dart';
+import '../configs/config.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:shelf/shelf.dart';
 
