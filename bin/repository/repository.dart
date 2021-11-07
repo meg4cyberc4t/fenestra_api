@@ -132,7 +132,7 @@ class Repository {
           '1': userid,
           '2': listid,
         });
-    return rows.isNotEmpty && rows[0].isNotEmpty;
+    return rows.isNotEmpty ? rows[0].isNotEmpty : false;
   }
 
   Future<bool> deleteNotificationListById(int listid, int ownerid) async {
@@ -141,5 +141,44 @@ class Repository {
         'DELETE FROM $tableNotificationList WHERE id = @1 AND owner_id = @2 RETURNING id',
         {'1': listid, '2': ownerid});
     return data[0].isNotEmpty;
+  }
+
+  Future<NotificationList> getListByListId(int listid) async {
+    var data = await executor.query(tableNotificationList,
+        'SELECT *  FROM $tableNotificationList WHERE id = @1', {'1': listid});
+    return NotificationList(
+      id: data[0][0],
+      ownerId: data[0][1],
+      moderatorIds: data[0][2],
+      subscribersIds: data[0][3],
+      title: data[0][4],
+      description: data[0][5],
+      public: data[0][6],
+    );
+  }
+
+  Future<void> editNotificationListByList(NotificationList list) async {
+    await executor.query(tableNotificationList,
+        "UPDATE $tableNotificationList SET title = @2 WHERE id = @1", {
+      '1': list.id,
+      '2': list.title,
+      '3': list.description,
+      '4': list.public,
+    });
+    await executor.query(tableNotificationList,
+        "UPDATE $tableNotificationList SET description = @3 WHERE id = @1", {
+      '1': list.id,
+      '2': list.title,
+      '3': list.description,
+      '4': list.public,
+    });
+    print('2');
+    await executor.query(tableNotificationList,
+        "UPDATE $tableNotificationList SET public = @4 WHERE id = @1", {
+      '1': list.id,
+      '2': list.title,
+      '3': list.description,
+      '4': list.public,
+    });
   }
 }

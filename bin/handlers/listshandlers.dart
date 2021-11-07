@@ -21,7 +21,7 @@ class ListsHandlers {
       late NotificationList list;
       try {
         dynamic input = jsonDecode(await request.readAsString());
-        list = NotificationList.fromJson(
+        list = NotificationList.fromParametersWithJson(
           json: input,
           id: -1,
           ownerId: request.context['id'] as int,
@@ -61,6 +61,37 @@ class ListsHandlers {
         return Response.ok(jsonEncode(ApiResponse(false).toMap()));
       }
       return Response.ok(jsonEncode(ApiResponse(true).toMap()));
+    });
+
+    router.patch('/<id>', (Request request, String id) async {
+      late NotificationList list;
+      try {
+        var listid = int.parse(id);
+        dynamic input = jsonDecode(await request.readAsString());
+        if (!await repos.getCheckRight(request.context['id'] as int, listid)) {
+          return Response.ok(jsonEncode(ApiError.accessDenied.toMap()));
+        }
+        input.remove('id');
+        input.remove('owner_id');
+        input.remove('moderator_ids');
+        input.remove('subscribers_ids');
+        NotificationList oldList = await repos.getListByListId(listid);
+        list = NotificationList.fromJsonWithParameters(
+          json: input,
+          id: listid,
+          ownerId: oldList.ownerId,
+          moderatorIds: oldList.moderatorIds,
+          subscribersIds: oldList.subscribersIds,
+          description: oldList.description,
+          public: oldList.public,
+          title: oldList.title,
+        );
+        await repos.editNotificationListByList(list);
+      } catch (e) {
+        print(e.toString());
+        return Response.ok(jsonEncode(ApiError.badArguments.toMap()));
+      }
+      return Response.ok(jsonEncode(ApiResponse('ok').toMap()));
     });
 
     router.all(

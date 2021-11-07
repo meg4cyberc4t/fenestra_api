@@ -17,7 +17,9 @@ class NotificationList {
     required this.public,
   });
 
-  NotificationList.fromJson({
+  NotificationList.fromParametersWithJson({
+    // В приоритете стоят переданные параметры,
+    // при их отсутствии данные берутся из json
     required Map<String, dynamic> json,
     id,
     ownerId,
@@ -34,6 +36,26 @@ class NotificationList {
     this.title = title ?? json['title'];
     this.description = description ?? json['description'];
     this.public = public ?? json['public'];
+  }
+
+  NotificationList.fromJsonWithParameters({
+    // В приоритете стоит json и лишь при отсутствии подставляются параметры
+    required Map<String, dynamic> json,
+    id,
+    ownerId,
+    moderatorIds,
+    subscribersIds,
+    title,
+    description,
+    public,
+  }) {
+    this.id = json['id'] ?? id;
+    this.ownerId = json['owner_id'] ?? ownerId;
+    this.moderatorIds = json['moderator_ids'] ?? moderatorIds;
+    this.subscribersIds = json['subscribers_ids'] ?? subscribersIds;
+    this.title = json['title'] ?? title;
+    this.description = json['description'] ?? description;
+    this.public = json['public'] ?? public;
   }
 
   late int id;
