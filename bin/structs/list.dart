@@ -1,11 +1,3 @@
-//  id serial unique PRIMARY KEY,
-//     owner_id integer not null,
-//     moderator_ids integer[] not null,
-//     subscribers_ids integer[] not null,
-//     title varchar(255) not null,
-//     description varchar(255) not null,
-//     public boolean not null
-
 class NotificationList {
   NotificationList({
     required this.id,

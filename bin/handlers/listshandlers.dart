@@ -21,47 +21,32 @@ class ListsHandlers {
         json: input,
         id: -1,
         ownerId: request.context['id'] as int,
-        moderatorIds: [request.context['id'] as int],
-        subscribersIds: [request.context['id'] as int],
+        moderatorIds: <int>[],
+        subscribersIds: <int>[],
       );
-      await repos.createNotificationListByList(list);
-      return Response.ok({'id': list.id});
+      await repos.lists.create(list);
+      return Response(201);
     });
 
     router.get('/', (Request request) async {
-      var lists = await repos.getListsByUserId(request.context['id'] as int);
-      List out = [];
-      for (NotificationList item in lists) {
-        out.add(item.toMap());
-      }
-      return Response.ok(jsonEncode(out));
+      var lists = await repos.lists.getAll(request.context['id'] as int);
+      return Response.ok(jsonEncode(lists.map((e) => e.toMap()).toList()));
     });
 
     router.delete('/<id>', (Request request, String id) async {
-      late int listid;
-      listid = int.parse(id);
-      if (!await repos.getCheckRight(request.context['id'] as int, listid)) {
-        throw "Not access to $listid notification list";
-      }
-      if (!await repos.deleteNotificationListById(
-          listid, request.context['id'] as int)) {
-        return Response.notFound('List not found');
-      }
+      await repos.lists.delete(int.parse(id), request.context['id'] as int);
       return Response(204);
     });
 
     router.patch('/<id>', (Request request, String id) async {
       int listid = int.parse(id);
-      dynamic input = jsonDecode(await request.readAsString());
-      if (!await repos.getCheckRight(request.context['id'] as int, listid)) {
-        throw "Not access to $listid notification list";
-      }
-      input
+      dynamic input = jsonDecode(await request.readAsString())
         ..remove('id')
         ..remove('owner_id')
         ..remove('moderator_ids')
         ..remove('subscribers_ids');
-      NotificationList oldList = await repos.getListByListId(listid);
+      NotificationList oldList =
+          await repos.lists.getById(listid, request.context['id'] as int);
       NotificationList list = NotificationList.fromJsonWithParameters(
         json: input,
         id: listid,
@@ -72,7 +57,7 @@ class ListsHandlers {
         public: oldList.public,
         title: oldList.title,
       );
-      await repos.editNotificationListByList(list);
+      await repos.lists.edit(list);
       return Response.ok(jsonEncode(list.toMap()));
     });
 

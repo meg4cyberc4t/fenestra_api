@@ -6,6 +6,7 @@ import 'package:shelf/shelf.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
+import '../structs/refresh_token.dart';
 import '../structs/user.dart';
 
 class AuthHandlers {
@@ -22,13 +23,13 @@ class AuthHandlers {
       selectUser = User.fromJson(json: input, id: -1);
       selectUser.passwordHash =
           md5.convert(utf8.encode(selectUser.passwordHash)).toString();
-      if (!await repos.checkUniqueLogin(selectUser.login)) {
+      if (!await repos.users.checkUniqueLogin(selectUser.login)) {
         return Response(422);
       }
-      await repos.addNewUser(selectUser);
+      await repos.users.add(selectUser);
       String authToken = generateAuthToken(selectUser);
       String refreshToken = generateRefreshToken(selectUser);
-      repos.writeRefreshToken(selectUser, refreshToken);
+      await repos.tokens.write(selectUser.id, refreshToken);
       return Response.ok(jsonEncode({
         'id': selectUser.id,
         'authToken': authToken,
@@ -41,17 +42,14 @@ class AuthHandlers {
       User selectUser = User.fromJson(json: input, id: -1, name: "");
       selectUser.passwordHash =
           md5.convert(utf8.encode(selectUser.passwordHash)).toString();
-      if (await repos.checkUniqueLogin(selectUser.login)) {
-        return Response(422);
-      }
-      selectUser.id = await repos.getIdByLogin(selectUser.login);
+      selectUser.id = await repos.users.getIdByLogin(selectUser.login);
       if (selectUser.passwordHash !=
-          await repos.getPasswordHashById(selectUser.id)) {
+          (await repos.users.getFromId(selectUser.id)).passwordHash) {
         return Response(401);
       }
       String authToken = generateAuthToken(selectUser);
       String refreshToken = generateRefreshToken(selectUser);
-      repos.writeRefreshToken(selectUser, refreshToken);
+      await repos.tokens.write(selectUser.id, refreshToken);
       return Response.ok(jsonEncode({
         'id': selectUser.id,
         'authToken': authToken,
@@ -61,19 +59,16 @@ class AuthHandlers {
 
     router.post('/reload-token', (Request request) async {
       dynamic input = jsonDecode(await request.readAsString());
-      String refreshToken = input['refreshToken'];
-      int refreshTokenId =
-          await repos.getIdRefreshTokenByRefreshToken(refreshToken);
-      int ownerId = await repos.getOwnerIdByRefreshToken(refreshToken);
-      User selectUser = await repos.getUserfromId(ownerId);
+      String token = input['refreshToken'];
+      RefreshToken refreshToken = await repos.tokens.get(token);
+      User selectUser = await repos.users.getFromId(refreshToken.ownerId);
       String authToken = generateAuthToken(selectUser);
       String newRefreshToken = generateRefreshToken(selectUser);
-      repos.rewriteRefreshTokenByRefreshTokenId(
-          newRefreshToken, refreshTokenId);
+      await repos.tokens.rewrite(refreshToken.id, newRefreshToken);
       return Response.ok(jsonEncode({
         'id': selectUser.id,
         'authToken': authToken,
-        'refreshToken': refreshToken,
+        'refreshToken': newRefreshToken
       }));
     });
 
