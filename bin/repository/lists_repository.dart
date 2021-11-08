@@ -12,7 +12,7 @@ class NotificationListsRepository {
         __tableName,
         "INSERT INTO $__tableName"
         "(owner_id, moderator_ids, subscribers_ids, title, description, public)"
-        "VALUES (@1, ARRAY${list.moderatorIds}::integer[], ARRAY${list.subscribersIds}::integer, @4, @5, @6) RETURNING id",
+        "VALUES (@1, ARRAY${list.moderatorIds}::integer[], ARRAY${list.subscribersIds}::integer[], @4, @5, @6) RETURNING id",
         {
           '1': list.ownerId,
           '4': list.title,
