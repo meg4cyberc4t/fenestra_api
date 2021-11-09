@@ -24,10 +24,6 @@ class Service {
         '/auth/',
         Pipeline()
             .addMiddleware(setJsonHeader())
-            .addMiddleware(createMiddleware(
-              responseHandler: (Response response) => response
-                  .change(headers: {"Content-Type": 'application/json'}),
-            ))
             .addMiddleware(handleErrors())
             .addHandler(AuthHandlers(repos, serverSecretKey).router));
 
