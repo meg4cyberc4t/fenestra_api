@@ -23,3 +23,4 @@ doc/api/
 .database
 .database/
 .DS_store
+.env*

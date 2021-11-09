@@ -4,11 +4,13 @@ import 'package:postgres/postgres.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'extensions/dotnetmethods.dart';
 import 'extensions/ymlmethods.dart';
 import 'handlers/listshandlers.dart';
 import 'handlers/middleware.dart';
 import 'handlers/authhandlers.dart';
 import 'repository/repository.dart';
+import 'package:dotenv/dotenv.dart' show env;
 
 class Service {
   const Service(this.repos, this.serverSecretKey);
@@ -46,7 +48,8 @@ class Service {
 }
 
 void main() async {
-  Map serverConfig = await loadYamlFile('bin/config.yml');
+  loadEnv();
+  Map serverConfig = await loadYamlFile('bin/configs/config.yml');
   PostgreSqlExecutorPool executor =
       PostgreSqlExecutorPool(Platform.numberOfProcessors, () {
     return PostgreSQLConnection(
@@ -54,7 +57,7 @@ void main() async {
       serverConfig['database']['port'],
       serverConfig['database']['databaseName'],
       username: serverConfig['database']['username'],
-      password: serverConfig['database']['password'],
+      password: env['DBPASSWORD'],
       useSSL: serverConfig['database']['useSSL'],
     );
   });

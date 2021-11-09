@@ -8,6 +8,5 @@ database:
   port: 5432
   databaseName: postgres
   username: postgres
-  password: SUPERPASSWORD
   useSSL: false
 
