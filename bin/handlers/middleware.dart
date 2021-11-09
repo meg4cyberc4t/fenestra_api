@@ -1,4 +1,3 @@
-import '../configs/config.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:shelf/shelf.dart';
 
@@ -11,7 +10,7 @@ Middleware handleAuth(String secret) {
         if (token.startsWith('Bearer ')) {
           token = token.substring(7);
         }
-        JWT jwt = JWT.verify(token, SecretKey(secretServerKey));
+        JWT jwt = JWT.verify(token, SecretKey(secret));
         updatedRequest = request.change(context: {'id': jwt.payload['id']});
       } catch (e) {
         print('handleAuth: $e');
@@ -31,6 +30,15 @@ Middleware handleErrors() {
         print("handleErrors: $e");
         return Response(403);
       }
+    };
+  };
+}
+
+Middleware setJsonHeader() {
+  return (Handler innerHandler) {
+    return (Request request) async {
+      return await innerHandler(
+          request.change(headers: {"Content-Type": 'application/json'}));
     };
   };
 }
