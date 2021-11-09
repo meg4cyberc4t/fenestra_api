@@ -1,0 +1,12 @@
+server:
+  host: localhost
+  port: 8080
+  secretServerKey: ALOHAMORA
+
+database: 
+  host: localhost
+  port: 5432
+  databaseName: postgres
+  username: postgres
+  useSSL: false
+

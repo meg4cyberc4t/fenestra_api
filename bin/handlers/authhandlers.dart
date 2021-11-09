@@ -10,9 +10,9 @@ import '../structs/refresh_token.dart';
 import '../structs/user.dart';
 
 class AuthHandlers {
-  AuthHandlers(this.repos, this.defaultHeaders);
+  const AuthHandlers(this.repos, this.serverSecretKey);
   final Repository repos;
-  final Map<String, String> defaultHeaders;
+  final String serverSecretKey;
 
   Router get router {
     final router = Router();
@@ -27,8 +27,8 @@ class AuthHandlers {
         return Response(422);
       }
       await repos.users.add(selectUser);
-      String authToken = generateAuthToken(selectUser);
-      String refreshToken = generateRefreshToken(selectUser);
+      String authToken = generateAuthToken(selectUser, serverSecretKey);
+      String refreshToken = generateRefreshToken(selectUser, serverSecretKey);
       await repos.tokens.write(selectUser.id, refreshToken);
       return Response.ok(jsonEncode({
         'id': selectUser.id,
@@ -47,8 +47,8 @@ class AuthHandlers {
           (await repos.users.getFromId(selectUser.id)).passwordHash) {
         return Response(401);
       }
-      String authToken = generateAuthToken(selectUser);
-      String refreshToken = generateRefreshToken(selectUser);
+      String authToken = generateAuthToken(selectUser, serverSecretKey);
+      String refreshToken = generateRefreshToken(selectUser, serverSecretKey);
       await repos.tokens.write(selectUser.id, refreshToken);
       return Response.ok(jsonEncode({
         'id': selectUser.id,
@@ -62,8 +62,9 @@ class AuthHandlers {
       String token = input['refreshToken'];
       RefreshToken refreshToken = await repos.tokens.get(token);
       User selectUser = await repos.users.getFromId(refreshToken.ownerId);
-      String authToken = generateAuthToken(selectUser);
-      String newRefreshToken = generateRefreshToken(selectUser);
+      String authToken = generateAuthToken(selectUser, serverSecretKey);
+      String newRefreshToken =
+          generateRefreshToken(selectUser, serverSecretKey);
       await repos.tokens.rewrite(refreshToken.id, newRefreshToken);
       return Response.ok(jsonEncode({
         'id': selectUser.id,

@@ -4,40 +4,40 @@ import 'package:postgres/postgres.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'configs/config.dart';
+import 'extensions/dotnetmethods.dart';
+import 'extensions/ymlmethods.dart';
 import 'handlers/listshandlers.dart';
 import 'handlers/middleware.dart';
 import 'handlers/authhandlers.dart';
 import 'repository/repository.dart';
+import 'package:dotenv/dotenv.dart' show env;
 
 class Service {
-  Service(this.repos);
+  const Service(this.repos, this.serverSecretKey);
   final Repository repos;
+  final String serverSecretKey;
 
   Handler get handlers {
     final router = Router();
-    Map<String, String> defaultHeaders = {"Content-Type": 'application/json'};
 
     router.mount(
         '/auth/',
         Pipeline()
+            .addMiddleware(setJsonHeader())
             .addMiddleware(createMiddleware(
-              responseHandler: (Response response) =>
-                  response.change(headers: defaultHeaders),
+              responseHandler: (Response response) => response
+                  .change(headers: {"Content-Type": 'application/json'}),
             ))
             .addMiddleware(handleErrors())
-            .addHandler(AuthHandlers(repos, defaultHeaders).router));
+            .addHandler(AuthHandlers(repos, serverSecretKey).router));
 
     router.mount(
         '/lists/',
         Pipeline()
-            .addMiddleware(createMiddleware(
-              responseHandler: (Response response) =>
-                  response.change(headers: defaultHeaders),
-            ))
+            .addMiddleware(setJsonHeader())
             .addMiddleware(handleErrors())
-            .addMiddleware(handleAuth(secretServerKey))
-            .addHandler(ListsHandlers(repos, defaultHeaders).router));
+            .addMiddleware(handleAuth(serverSecretKey))
+            .addHandler(ListsHandlers(repos).router));
 
     router.all(
       '/<ignored|.*>',
@@ -48,20 +48,26 @@ class Service {
 }
 
 void main() async {
+  loadEnv();
+  Map serverConfig = await loadYamlFile('bin/configs/config.yml');
   PostgreSqlExecutorPool executor =
       PostgreSqlExecutorPool(Platform.numberOfProcessors, () {
     return PostgreSQLConnection(
-      'localhost',
-      5432,
-      'postgres',
-      username: 'postgres',
-      password: 'SUPERPASSWORD',
-      useSSL: false,
+      serverConfig['database']['host'],
+      serverConfig['database']['port'],
+      serverConfig['database']['databaseName'],
+      username: serverConfig['database']['username'],
+      password: env['DBPASSWORD'],
+      useSSL: serverConfig['database']['useSSL'],
     );
   });
 
   Repository repos = Repository(executor);
-  Service service = Service(repos);
-  final server = await shelf_io.serve(service.handlers, 'localhost', 8080);
+  Service service = Service(repos, serverConfig['server']['secretServerKey']);
+  final server = await shelf_io.serve(
+    service.handlers,
+    serverConfig['server']['host'],
+    serverConfig['server']['port'],
+  );
   print('Server running on ${server.address}:${server.port}');
 }

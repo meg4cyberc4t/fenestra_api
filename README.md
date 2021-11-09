@@ -4,9 +4,10 @@
 
 ### Steps for launch
 
-- make build (Start postgres database on port 5432)
-- make migrate_up (Apply migrations)
-- dart run bin/main.dart (Start server on port 8080)
+- Create .env file and export the DB PASSWORD variable with the password from the database (By default it is included in .gitignore)
+- Make build (Start postgres database on port 5432)
+- Make migrate_up (Apply migrations)
+- Dart run bin/main.dart (Start server on port 8080)
 
 ### Also important
 - make migration_down (Discard migrations)

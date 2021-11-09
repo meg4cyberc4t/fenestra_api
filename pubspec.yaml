@@ -6,10 +6,6 @@ homepage: https://github.com/meg4cyberc4t/notify-api
 environment:
   sdk: '>=2.15.0-168.0.dev <3.0.0'
 
-
-# dependencies:
-#   path: ^1.8.0
-
 dev_dependencies:
   lints: ^1.0.0
 
@@ -18,3 +14,5 @@ dependencies:
   angel3_orm_postgres: ^3.1.0
   postgres: ^2.4.1+2
   dart_jsonwebtoken: ^2.4.0
+  yaml: ^3.1.0
+  dotenv: ^3.0.0

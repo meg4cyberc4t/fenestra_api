@@ -8,9 +8,8 @@ import 'package:shelf/shelf.dart';
 import '../structs/list.dart';
 
 class ListsHandlers {
-  ListsHandlers(this.repos, this.defaultHeaders);
+  const ListsHandlers(this.repos);
   final Repository repos;
-  final Map<String, String> defaultHeaders;
 
   Router get router {
     final router = Router();

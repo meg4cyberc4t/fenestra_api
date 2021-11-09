@@ -1,9 +1,8 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
-import '../configs/config.dart';
 import '../structs/user.dart';
 
-String generateAuthToken(User user) {
+String generateAuthToken(User user, String secretServerKey) {
   final jwt = JWT(
     {
       'id': user.id,
@@ -16,7 +15,7 @@ String generateAuthToken(User user) {
   return jwt.sign(SecretKey(secretServerKey));
 }
 
-String generateRefreshToken(User user) {
+String generateRefreshToken(User user, String secretServerKey) {
   final jwt = JWT(
     {
       'id': user.id,
