@@ -1,48 +1,31 @@
-BEGIN;
-CREATE TABLE users 
-(
-    id serial unique PRIMARY KEY,
-    name varchar(255) not null,
-    login varchar(255) not null unique,
-    password_hash varchar(255) not null
+CREATE TABLE "users" (
+	"id" uuid NOT NULL PRIMARY KEY,
+	"first_name" varchar NOT NULL,
+	"last_name" varchar NOT NULL,
+	"login" varchar NOT NULL UNIQUE,
+	"password_hash" varchar NOT NULL,
+	"colleagues" integer[] NOT NULL DEFAULT array[]::integer[],
+	"subscribers" integer[]NOT NULL DEFAULT array[]::integer[],
+	"photo" varchar,
+	"photo200" varchar
 );
 
-CREATE TABLE referrals
-(
-    id serial unique PRIMARY KEY,
-    owner_id integer not null,
-    list_id integer not null,
-    code varchar(255) not null,
-    alive boolean not null
-
+CREATE TABLE "notifications" (
+	"id" uuid NOT NULL UNIQUE PRIMARY KEY,
+	"title" varchar(255) NOT NULL,
+	"description" varchar(255) NOT NULL,
+	"owner" uuid NOT NULL,
+	"deadline" TIMESTAMP WITH TIME ZONE NOT NULL,
+	"repeat" smallint
 );
 
-CREATE TABLE notification_lists
-(
-    id serial unique PRIMARY KEY,
-    owner_id integer not null,
-    moderator_ids integer[] not null,
-    subscribers_ids integer[] not null,
-    title varchar(255) not null,
-    description varchar(255) not null,
-    public boolean not null
+
+
+CREATE TABLE "refresh_tokens" (
+	"id" uuid NOT NULL PRIMARY KEY,
+	"owner" uuid NOT NULL,
+	"token" varchar(255) NOT NULL
 );
 
-CREATE TABLE notification_items
-(
-    id serial unique PRIMARY KEY,
-    list_id integer not null,
-    title varchar(255) not null,
-    description varchar(255),
-    deadline integer,
-    owner_id integer not null,
-    repeat boolean not null
-);
-
-CREATE TABLE refresh_tokens
-(
-    id serial unique PRIMARY KEY,
-    owner_id integer not null,
-    token varchar(255) not null unique
-);
-COMMIT;
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");
+ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");
