@@ -11,7 +11,6 @@ dev_dependencies:
 
 dependencies: 
   shelf_router: ^1.1.2
-  angel3_orm_postgres: ^3.1.0
   postgres: ^2.4.1+2
   dart_jsonwebtoken: ^2.4.0
   yaml: ^3.1.0

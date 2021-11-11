@@ -1,30 +1,38 @@
-class User {
-  User({
+class UserStruct {
+  UserStruct({
     required this.id,
-    required this.name,
+    required this.firstName,
+    required this.lastName,
     required this.login,
     required this.passwordHash,
-  });
+    colleagues,
+    subscribers,
+    photo,
+    photo200,
+  })  : colleagues = colleagues ?? <int>[],
+        subscribers = subscribers ?? <int>[],
+        photo = photo ?? "",
+        photo200 = photo200 ?? "";
 
-  User.fromJson(
-      {required Map<String, dynamic> json, id, login, name, passwordHash}) {
-    this.id = id ?? json['id'];
-    this.login = login ?? json['login'];
-    this.name = name ?? json['name'];
-    this.passwordHash = passwordHash ?? json['password'];
+  UserStruct.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    firstName = json['first_name'];
+    lastName = json['last_name'];
+    login = json['login'];
+    passwordHash = json['password'];
+    colleagues = json['colleagues'] ?? <int>[];
+    subscribers = json['subscribers'] ?? <int>[];
+    photo = json['photo'] ?? "";
+    photo200 = json['photo200'] ?? "";
   }
 
-  late int id;
-  late String name;
+  late int? id;
+  late String firstName;
+  late String lastName;
   late String login;
   late String passwordHash;
-
-  Map toMap() {
-    return {"id": id, "name": name, "login": login, "password": passwordHash};
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  List<int> colleagues = <int>[];
+  List<int> subscribers = <int>[];
+  String photo = "";
+  String photo200 = "";
 }

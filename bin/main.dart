@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:angel3_orm_postgres/angel3_orm_postgres.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
@@ -24,20 +22,16 @@ class Service {
         '/auth/',
         Pipeline()
             .addMiddleware(setJsonHeader())
-            .addMiddleware(createMiddleware(
-              responseHandler: (Response response) => response
-                  .change(headers: {"Content-Type": 'application/json'}),
-            ))
             .addMiddleware(handleErrors())
             .addHandler(AuthHandlers(repos, serverSecretKey).router));
 
-    router.mount(
-        '/lists/',
-        Pipeline()
-            .addMiddleware(setJsonHeader())
-            .addMiddleware(handleErrors())
-            .addMiddleware(handleAuth(serverSecretKey))
-            .addHandler(ListsHandlers(repos).router));
+    // router.mount(
+    //     '/lists/',
+    //     Pipeline()
+    //         .addMiddleware(setJsonHeader())
+    //         .addMiddleware(handleErrors())
+    //         .addMiddleware(handleAuth(serverSecretKey))
+    //         .addHandler(ListsHandlers(repos).router));
 
     router.all(
       '/<ignored|.*>',
@@ -50,19 +44,16 @@ class Service {
 void main() async {
   loadEnv();
   Map serverConfig = await loadYamlFile('bin/configs/config.yml');
-  PostgreSqlExecutorPool executor =
-      PostgreSqlExecutorPool(Platform.numberOfProcessors, () {
-    return PostgreSQLConnection(
-      serverConfig['database']['host'],
-      serverConfig['database']['port'],
-      serverConfig['database']['databaseName'],
-      username: serverConfig['database']['username'],
-      password: env['DBPASSWORD'],
-      useSSL: serverConfig['database']['useSSL'],
-    );
-  });
-
-  Repository repos = Repository(executor);
+  PostgreSQLConnection connection = PostgreSQLConnection(
+    serverConfig['database']['host'],
+    serverConfig['database']['port'],
+    serverConfig['database']['databaseName'],
+    username: serverConfig['database']['username'],
+    password: env['DBPASSWORD'],
+    useSSL: serverConfig['database']['useSSL'],
+  );
+  await connection.open();
+  Repository repos = Repository(connection);
   Service service = Service(repos, serverConfig['server']['secretServerKey']);
   final server = await shelf_io.serve(
     service.handlers,
