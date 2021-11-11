@@ -1,30 +1,41 @@
-class User {
-  User({
+import 'package:uuid/uuid.dart';
+
+class UserStruct {
+  UserStruct({
     required this.id,
-    required this.name,
+    required this.firstName,
+    required this.lastName,
     required this.login,
     required this.passwordHash,
+    required this.colleagues,
+    required this.subscribers,
+    required this.photo,
+    required this.photo200,
   });
 
-  User.fromJson(
-      {required Map<String, dynamic> json, id, login, name, passwordHash}) {
-    this.id = id ?? json['id'];
-    this.login = login ?? json['login'];
-    this.name = name ?? json['name'];
-    this.passwordHash = passwordHash ?? json['password'];
+  UserStruct.fromJson(Map<String, dynamic> json) {
+    id = UuidValue(json['id']);
+    firstName = json['first_name'];
+    lastName = json['last_name'];
+    login = json['login'];
+    passwordHash = json['password_hash'];
+    colleagues =
+        json['colleagues'].map((dynamic value) => UuidValue(value)).toList();
+    ;
+    subscribers =
+        json['subscribers'].map((dynamic value) => UuidValue(value)).toList();
+    ;
+    photo = json['photo'];
+    photo200 = json['photo200'];
   }
 
-  late int id;
-  late String name;
+  late UuidValue id;
+  late String firstName;
+  late String lastName;
   late String login;
   late String passwordHash;
-
-  Map toMap() {
-    return {"id": id, "name": name, "login": login, "password": passwordHash};
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  late List<UuidValue> colleagues;
+  late List<UuidValue> subscribers;
+  late String photo;
+  late String photo200;
 }

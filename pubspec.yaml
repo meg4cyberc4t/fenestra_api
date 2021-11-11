@@ -16,3 +16,4 @@ dependencies:
   dart_jsonwebtoken: ^2.4.0
   yaml: ^3.1.0
   dotenv: ^3.0.0
+  uuid: ^3.0.5
