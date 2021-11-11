@@ -1,11 +1,7 @@
-import 'dart:convert';
-
 import '../repository/repository.dart';
 
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
-
-import '../structs/notifications.dart';
 
 class ListsHandlers {
   const ListsHandlers(this.repos);

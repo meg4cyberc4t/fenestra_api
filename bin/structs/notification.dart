@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 class NotificationStruct {
   NotificationStruct({
     required this.id,
@@ -11,18 +9,18 @@ class NotificationStruct {
   });
 
   NotificationStruct.fromJson(Map<String, dynamic> json) {
-    id = UuidValue(json['id']);
+    id = json['id'];
     title = json['title'];
     description = json['description'];
-    owner = UuidValue(json['owner']);
+    owner = json['owner'];
     deadline = DateTime.fromMillisecondsSinceEpoch(json['deadline']);
     repeat = json['repeat'];
   }
 
-  late UuidValue id;
+  late String id;
   late String title;
   late String description;
-  late UuidValue owner;
+  late String owner;
   late DateTime deadline;
   late int repeat;
 }

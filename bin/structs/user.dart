@@ -1,4 +1,5 @@
-import 'package:uuid/uuid.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 class UserStruct {
   UserStruct({
@@ -7,35 +8,34 @@ class UserStruct {
     required this.lastName,
     required this.login,
     required this.passwordHash,
-    required this.colleagues,
-    required this.subscribers,
-    required this.photo,
-    required this.photo200,
-  });
+    colleagues,
+    subscribers,
+    photo,
+    photo200,
+  })  : colleagues = colleagues ?? <String>[],
+        subscribers = subscribers ?? <String>[],
+        photo = photo ?? "",
+        photo200 = photo200 ?? "";
 
   UserStruct.fromJson(Map<String, dynamic> json) {
-    id = UuidValue(json['id']);
+    id = json['id'];
     firstName = json['first_name'];
     lastName = json['last_name'];
     login = json['login'];
-    passwordHash = json['password_hash'];
-    colleagues =
-        json['colleagues'].map((dynamic value) => UuidValue(value)).toList();
-    ;
-    subscribers =
-        json['subscribers'].map((dynamic value) => UuidValue(value)).toList();
-    ;
-    photo = json['photo'];
-    photo200 = json['photo200'];
+    passwordHash = json['password'];
+    colleagues = json['colleagues'] ?? [];
+    subscribers = json['subscribers'] ?? [];
+    photo = json['photo'] ?? "";
+    photo200 = json['photo200'] ?? "";
   }
 
-  late UuidValue id;
+  late String? id;
   late String firstName;
   late String lastName;
   late String login;
   late String passwordHash;
-  late List<UuidValue> colleagues;
-  late List<UuidValue> subscribers;
-  late String photo;
-  late String photo200;
+  List<String> colleagues = <String>[];
+  List<String> subscribers = <String>[];
+  String photo = "";
+  String photo200 = "";
 }

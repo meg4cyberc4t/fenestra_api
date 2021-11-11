@@ -1,5 +1,5 @@
 CREATE TABLE "users" (
-	"id" uuid NOT NULL PRIMARY KEY,
+	"id" uuid UNIQUE PRIMARY KEY,
 	"first_name" varchar NOT NULL,
 	"last_name" varchar NOT NULL,
 	"login" varchar NOT NULL UNIQUE,
@@ -11,7 +11,7 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "notifications" (
-	"id" uuid NOT NULL UNIQUE PRIMARY KEY,
+	"id" uuid UNIQUE PRIMARY KEY,
 	"title" varchar(255) NOT NULL,
 	"description" varchar(255) NOT NULL,
 	"owner" uuid NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE "notifications" (
 );
 
 CREATE TABLE "folders" (
-	"id" uuid NOT NULL UNIQUE PRIMARY KEY,
+	"id" uuid UNIQUE PRIMARY KEY,
 	"owner" uuid NOT NULL,
 	"participants" uuid[] NOT NULL DEFAULT array[]::uuid[],
 	"title" varchar(255) NOT NULL,
@@ -29,9 +29,9 @@ CREATE TABLE "folders" (
 );
 
 CREATE TABLE "refresh_tokens" (
-	"id" uuid NOT NULL PRIMARY KEY,
+	"id" uuid UNIQUE PRIMARY KEY,
 	"owner" uuid NOT NULL,
-	"token" varchar(255) NOT NULL
+	"token" varchar NOT NULL
 );
 
 ALTER TABLE "notifications" ADD CONSTRAINT "notifications_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");
