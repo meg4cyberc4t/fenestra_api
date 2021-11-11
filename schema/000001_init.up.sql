@@ -1,36 +1,36 @@
 CREATE TABLE "users" (
-	"id" uuid UNIQUE PRIMARY KEY,
+	"id" integer UNIQUE PRIMARY KEY,
 	"first_name" varchar NOT NULL,
 	"last_name" varchar NOT NULL,
 	"login" varchar NOT NULL UNIQUE,
 	"password_hash" varchar NOT NULL,
-	"colleagues" integer[] NOT NULL DEFAULT array[]::integer[],
-	"subscribers" integer[] NOT NULL DEFAULT array[]::integer[],
+	"colleagues" integer[] DEFAULT ARRAY[]::integer[],
+	"subscribers" integer[] DEFAULT ARRAY[]::integer[],
 	"photo" varchar,
 	"photo200" varchar
 );
 
 CREATE TABLE "notifications" (
-	"id" uuid UNIQUE PRIMARY KEY,
+	"id" integer UNIQUE PRIMARY KEY,
 	"title" varchar(255) NOT NULL,
 	"description" varchar(255) NOT NULL,
-	"owner" uuid NOT NULL,
+	"owner" integer NOT NULL,
 	"deadline" TIMESTAMP WITH TIME ZONE NOT NULL,
 	"repeat" smallint
 );
 
 CREATE TABLE "folders" (
-	"id" uuid UNIQUE PRIMARY KEY,
-	"owner" uuid NOT NULL,
-	"participants" uuid[] NOT NULL DEFAULT array[]::uuid[],
+	"id" integer UNIQUE PRIMARY KEY,
+	"owner" integer NOT NULL,
+	"participants" integer[] DEFAULT ARRAY[]::integer[], 
 	"title" varchar(255) NOT NULL,
 	"description" varchar(255) NOT NULL,
 	"priority" smallint DEFAULT 0
 );
 
 CREATE TABLE "refresh_tokens" (
-	"id" uuid UNIQUE PRIMARY KEY,
-	"owner" uuid NOT NULL,
+	"id" integer UNIQUE PRIMARY KEY,
+	"owner" integer NOT NULL,
 	"token" varchar NOT NULL
 );
 

@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
-
 class UserStruct {
   UserStruct({
     required this.id,
@@ -12,8 +9,8 @@ class UserStruct {
     subscribers,
     photo,
     photo200,
-  })  : colleagues = colleagues ?? <String>[],
-        subscribers = subscribers ?? <String>[],
+  })  : colleagues = colleagues ?? <int>[],
+        subscribers = subscribers ?? <int>[],
         photo = photo ?? "",
         photo200 = photo200 ?? "";
 
@@ -23,19 +20,19 @@ class UserStruct {
     lastName = json['last_name'];
     login = json['login'];
     passwordHash = json['password'];
-    colleagues = json['colleagues'] ?? [];
-    subscribers = json['subscribers'] ?? [];
+    colleagues = json['colleagues'] ?? <int>[];
+    subscribers = json['subscribers'] ?? <int>[];
     photo = json['photo'] ?? "";
     photo200 = json['photo200'] ?? "";
   }
 
-  late String? id;
+  late int? id;
   late String firstName;
   late String lastName;
   late String login;
   late String passwordHash;
-  List<String> colleagues = <String>[];
-  List<String> subscribers = <String>[];
+  List<int> colleagues = <int>[];
+  List<int> subscribers = <int>[];
   String photo = "";
   String photo200 = "";
 }

@@ -42,41 +42,40 @@ class AuthHandlers {
       }));
     });
 
-    // router.post('/sign-in', (Request request) async {
-    //   dynamic input = jsonDecode(await request.readAsString());
-    //   UserStruct selectUser = UserStruct.fromJson(json: input, id: -1, name: "");
-    //   selectUser.passwordHash =
-    //       md5.convert(utf8.encode(selectUser.passwordHash)).toString();
-    //   selectUser.id = await repos.users.getIdByLogin(selectUser.login);
-    //   if (selectUser.passwordHash !=
-    //       (await repos.users.getFromId(selectUser.id)).passwordHash) {
-    //     return Response(401);
-    //   }
-    //   String authToken = generateAuthToken(selectUser, serverSecretKey);
-    //   String refreshToken = generateRefreshToken(selectUser, serverSecretKey);
-    //   await repos.tokens.write(selectUser.id, refreshToken);
-    //   return Response.ok(jsonEncode({
-    //     'id': selectUser.id,
-    //     'authToken': authToken,
-    //     'refreshToken': refreshToken,
-    //   }));
-    // });
+    router.post('/sign-in', (Request request) async {
+      dynamic input = jsonDecode(await request.readAsString());
+      int id = await repos.users.getIdFromLoginPassword(input['login'],
+          md5.convert(utf8.encode(input['password'])).toString());
+      UserStruct user = await repos.users.getFromId(id);
+      print(user.colleagues);
+      String authToken = generateAuthToken(user, serverSecretKey);
+      String refreshToken = generateRefreshToken(user, serverSecretKey);
+      await repos.refreshTokens.write(RefreshTokenStruct(
+        id: null,
+        owner: user.id!,
+        token: refreshToken,
+      ));
+      return Response.ok(jsonEncode({
+        'id': user.id,
+        'authToken': authToken,
+        'refreshToken': refreshToken,
+      }));
+    });
 
-    // router.post('/reload-token', (Request request) async {
-    //   dynamic input = jsonDecode(await request.readAsString());
-    //   String token = input['refreshToken'];
-    //   RefreshTokenStruct refreshToken = await repos.tokens.get(token);
-    //   UserStruct selectUser = await repos.users.getFromId(refreshToken.ownerId);
-    //   String authToken = generateAuthToken(selectUser, serverSecretKey);
-    //   String newRefreshToken =
-    //       generateRefreshToken(selectUser, serverSecretKey);
-    //   await repos.tokens.rewrite(refreshToken.id, newRefreshToken);
-    //   return Response.ok(jsonEncode({
-    //     'id': selectUser.id,
-    //     'authToken': authToken,
-    //     'refreshToken': newRefreshToken
-    //   }));
-    // });
+    router.post('/reload-token', (Request request) async {
+      dynamic input = jsonDecode(await request.readAsString());
+      RefreshTokenStruct refreshToken =
+          await repos.refreshTokens.get(input['refreshToken']);
+      UserStruct selectUser = await repos.users.getFromId(refreshToken.owner);
+      String authToken = generateAuthToken(selectUser, serverSecretKey);
+      refreshToken.token = generateRefreshToken(selectUser, serverSecretKey);
+      await repos.refreshTokens.rewrite(refreshToken);
+      return Response.ok(jsonEncode({
+        'id': selectUser.id,
+        'authToken': authToken,
+        'refreshToken': refreshToken.token
+      }));
+    });
 
     router.all(
       '/<ignored|.*>',

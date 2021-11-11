@@ -17,10 +17,10 @@ class NotificationStruct {
     repeat = json['repeat'];
   }
 
-  late String id;
+  late int id;
   late String title;
   late String description;
-  late String owner;
+  late int owner;
   late DateTime deadline;
   late int repeat;
 }

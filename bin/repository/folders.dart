@@ -1,8 +1,8 @@
-import 'package:angel3_orm_postgres/angel3_orm_postgres.dart';
+import 'package:postgres/postgres.dart';
 
 class FoldersRepository {
   const FoldersRepository(this.__executor, this.__tableName);
-  final PostgreSqlExecutorPool __executor;
+  final PostgreSQLConnection __executor;
   final String __tableName;
 }
 

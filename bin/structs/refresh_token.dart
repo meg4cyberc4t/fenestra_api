@@ -11,7 +11,7 @@ class RefreshTokenStruct {
     token = json['token'];
   }
 
-  late String? id;
-  late String owner;
+  late int? id;
+  late int owner;
   late String token;
 }

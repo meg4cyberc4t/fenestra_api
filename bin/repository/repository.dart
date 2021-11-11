@@ -1,4 +1,4 @@
-import 'package:angel3_orm_postgres/angel3_orm_postgres.dart';
+import 'package:postgres/postgres.dart';
 
 import 'folders.dart';
 import 'notifications.dart';
@@ -12,7 +12,7 @@ class Repository {
     folders = FoldersRepository(executor, 'folders');
     refreshTokens = RefreshTokensRepository(executor, 'refresh_tokens');
   }
-  final PostgreSqlExecutorPool executor;
+  final PostgreSQLConnection executor;
   late UsersRepository users;
   late NotificationsRepository notifications;
   late FoldersRepository folders;
