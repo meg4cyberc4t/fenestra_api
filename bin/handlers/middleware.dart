@@ -37,8 +37,8 @@ Middleware handleErrors() {
 Middleware setJsonHeader() {
   return (Handler innerHandler) {
     return (Request request) async {
-      return await innerHandler(
-          request.change(headers: {"Content-Type": 'application/json'}));
+      Response response = await innerHandler(request);
+      return response.change(headers: {"Content-Type": 'application/json'});
     };
   };
 }
