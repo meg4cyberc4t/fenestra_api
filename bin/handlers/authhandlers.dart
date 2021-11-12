@@ -20,11 +20,13 @@ class AuthHandlers {
     router.post('/sign-up', (Request request) async {
       var input = jsonDecode(await request.readAsString());
       UserStruct selectUser = UserStruct(
-          id: null,
-          firstName: input['first_name'],
-          lastName: input['last_name'],
-          login: input['login'],
-          passwordHash: md5.convert(utf8.encode(input['password'])).toString());
+        id: null,
+        firstName: input['first_name'],
+        lastName: input['last_name'],
+        login: input['login'],
+        passwordHash: md5.convert(utf8.encode(input['password'])).toString(),
+        color: input['color'],
+      );
       try {
         await repos.users.add(selectUser);
       } catch (e) {

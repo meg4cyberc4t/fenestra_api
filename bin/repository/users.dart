@@ -27,14 +27,15 @@ class UsersRepository {
   Future<void> add(UserStruct user) async {
     user.id = await _generateId();
     var rows = await __executor.query(
-        "INSERT INTO $__tableName (id, first_name, last_name, login, password_hash, colleagues, subscribers)"
-        " VALUES (@1, @2, @3, @4, @5, ARRAY${user.colleagues}::integer[], ARRAY${user.subscribers}::integer[]) RETURNING id",
+        "INSERT INTO $__tableName (id, first_name, last_name, login, password_hash, colleagues, subscribers, color)"
+        " VALUES (@1, @2, @3, @4, @5, ARRAY${user.colleagues}::integer[], ARRAY${user.subscribers}::integer[], @6) RETURNING id",
         substitutionValues: {
           '1': user.id,
           '2': user.firstName,
           '3': user.lastName,
           '4': user.login,
           '5': user.passwordHash,
+          '6': user.color,
         });
     user.id = rows[0][0];
   }
@@ -58,8 +59,7 @@ class UsersRepository {
       passwordHash: data[0][4],
       colleagues: data[0][5],
       subscribers: data[0][6],
-      photo: data[0][7],
-      photo200: data[0][8],
+      color: data[0][7],
     );
   }
 
@@ -67,15 +67,14 @@ class UsersRepository {
     await __executor.query(
         "UPDATE $__tableName "
         "SET first_name = @1, last_name = @2, login = @3, "
-        "password_hash = @4, photo = @5, photo200 = @6 WHERE id = @7",
+        "password_hash = @4, color = @5 WHERE id = @6",
         substitutionValues: {
           '1': user.firstName,
           '2': user.lastName,
           '3': user.login,
           '4': user.passwordHash,
-          '5': user.photo,
-          '6': user.photo200,
-          '7': user.id,
+          '5': user.color,
+          '6': user.id,
         });
   }
 

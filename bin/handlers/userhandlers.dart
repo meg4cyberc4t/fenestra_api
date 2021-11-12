@@ -18,20 +18,16 @@ class UserHandlers {
     router.get('/', (Request request) async {
       UserStruct selectUser =
           await repos.users.getFromId(request.context['id'] as int);
-      return Response.ok(jsonEncode({
-        'id': selectUser.id,
-        'first_name': selectUser.firstName,
-        'last_name': selectUser.lastName,
-        'login': selectUser.login,
-        'colleagues': selectUser.colleagues,
-        'subscribers': selectUser.subscribers,
-        'photo': selectUser.photo,
-        'photo200': selectUser.photo200,
-      }));
+      return Response.ok(jsonEncode(selectUser.toMap()));
     });
 
     router.get('/<id>', (Request request, String id) async {
-      UserStruct selectUser = await repos.users.getFromId(int.parse(id));
+      late UserStruct selectUser;
+      try {
+        selectUser = await repos.users.getFromId(int.parse(id));
+      } catch (_) {
+        return Response(404);
+      }
       return Response.ok(jsonEncode(selectUser.toMap()));
     });
 
@@ -52,6 +48,9 @@ class UserHandlers {
         selectUser.passwordHash =
             md5.convert(utf8.encode(input['password'])).toString();
         repos.refreshTokens.logoutAll(selectUser.id!);
+      }
+      if (input['color'] != null) {
+        selectUser.color = input['color'];
       }
       repos.users.edit(selectUser);
       return Response.ok(jsonEncode(selectUser.toMap()));

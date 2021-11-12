@@ -6,8 +6,7 @@ CREATE TABLE "users" (
 	"password_hash" varchar NOT NULL,
 	"colleagues" integer[] DEFAULT ARRAY[]::integer[],
 	"subscribers" integer[] DEFAULT ARRAY[]::integer[],
-	"photo" varchar,
-	"photo200" varchar
+	"color" integer NOT NULL CHECK(color >=0 AND color <= 16777215)
 );
 
 CREATE TABLE "notifications" (
