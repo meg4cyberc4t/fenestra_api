@@ -4,9 +4,9 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'extensions/dotnetmethods.dart';
 import 'extensions/ymlmethods.dart';
-import 'handlers/listshandlers.dart';
 import 'handlers/middleware.dart';
 import 'handlers/authhandlers.dart';
+import 'handlers/userhandlers.dart';
 import 'repository/repository.dart';
 import 'package:dotenv/dotenv.dart' show env;
 
@@ -25,13 +25,13 @@ class Service {
             .addMiddleware(handleErrors())
             .addHandler(AuthHandlers(repos, serverSecretKey).router));
 
-    // router.mount(
-    //     '/lists/',
-    //     Pipeline()
-    //         .addMiddleware(setJsonHeader())
-    //         .addMiddleware(handleErrors())
-    //         .addMiddleware(handleAuth(serverSecretKey))
-    //         .addHandler(ListsHandlers(repos).router));
+    router.mount(
+        '/user/',
+        Pipeline()
+            .addMiddleware(setJsonHeader())
+            .addMiddleware(handleErrors())
+            .addMiddleware(handleAuth(serverSecretKey))
+            .addHandler(UserHandlers(repos).router));
 
     router.all(
       '/<ignored|.*>',

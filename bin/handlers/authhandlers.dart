@@ -47,7 +47,6 @@ class AuthHandlers {
       int id = await repos.users.getIdFromLoginPassword(input['login'],
           md5.convert(utf8.encode(input['password'])).toString());
       UserStruct user = await repos.users.getFromId(id);
-      print(user.colleagues);
       String authToken = generateAuthToken(user, serverSecretKey);
       String refreshToken = generateRefreshToken(user, serverSecretKey);
       await repos.refreshTokens.write(RefreshTokenStruct(

@@ -35,4 +35,15 @@ class UserStruct {
   List<int> subscribers = <int>[];
   String photo = "";
   String photo200 = "";
+
+  Map toMap() => {
+        'id': id,
+        'first_name': firstName,
+        'last_name': lastName,
+        'login': login,
+        'colleagues': colleagues,
+        'subscribers': subscribers,
+        'photo': photo,
+        'photo200': photo200,
+      };
 }

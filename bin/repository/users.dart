@@ -63,6 +63,22 @@ class UsersRepository {
     );
   }
 
+  Future<void> edit(UserStruct user) async {
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET first_name = @1, last_name = @2, login = @3, "
+        "password_hash = @4, photo = @5, photo200 = @6 WHERE id = @7",
+        substitutionValues: {
+          '1': user.firstName,
+          '2': user.lastName,
+          '3': user.login,
+          '4': user.passwordHash,
+          '5': user.photo,
+          '6': user.photo200,
+          '7': user.id,
+        });
+  }
+
   // Future<bool> checkUniqueLogin(String login) async {
   //   var rows = await __executor.query(__tableName,
   //       'SELECT * FROM $__tableName WHERE login = @1', {'1': login});
