@@ -25,7 +25,8 @@ class UserHandlers {
       late UserStruct selectUser;
       try {
         selectUser = await repos.users.getFromId(int.parse(id));
-      } catch (_) {
+      } catch (e) {
+        print(e);
         return Response(404);
       }
       return Response.ok(jsonEncode(selectUser.toMap()));
@@ -56,19 +57,30 @@ class UserHandlers {
       return Response.ok(jsonEncode(selectUser.toMap()));
     });
 
-    // router.post('/', (Request request) async {
-    //   late NotificationStruct list;
-    //   dynamic input = jsonDecode(await request.readAsString());
-    //   list = NotificationStruct.fromParametersWithJson(
-    //     json: input,
-    //     id: -1,
-    //     ownerId: request.context['id'] as int,
-    //     moderatorIds: <int>[],
-    //     subscribersIds: <int>[],
-    //   );
-    //   await repos.lists.create(list);
-    //   return Response(201);
-    // });
+    router.get('/<id>/bond', (Request request, String id) async {
+      int subjectId = int.parse(id);
+      UserStruct subjUser = await repos.users.getFromId(subjectId);
+      UserStruct selectUser =
+          await repos.users.getFromId(request.context['id'] as int);
+      if (!selectUser.colleagues.contains(subjUser.id) &&
+          subjUser.subscribers.contains(selectUser.id) &&
+          selectUser.subscribers.contains(subjUser.id)) {
+        await repos.users.addSubscribers(selectUser, subjUser);
+        // Если у владельца и обьекта нет связи
+      } else if (selectUser.subscribers.contains(subjUser.id)) {
+        await repos.users.deleteSubscribers(selectUser, subjUser);
+        // Если владелец подписан на обьект
+      } else if (subjUser.subscribers.contains(selectUser.id)) {
+        await repos.users.deleteSubscribers(subjUser, selectUser);
+        await repos.users.addBond(subjUser, selectUser);
+        // Если обьект подписан на владелец
+      } else {
+        await repos.users.deleteBond(subjUser, selectUser);
+        await repos.users.addSubscribers(subjUser, selectUser);
+        // Если владелец и субьект коллеги
+      }
+      return Response(201);
+    });
 
     router.all(
       '/<ignored|.*>',
