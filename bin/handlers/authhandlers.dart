@@ -20,11 +20,13 @@ class AuthHandlers {
     router.post('/sign-up', (Request request) async {
       var input = jsonDecode(await request.readAsString());
       UserStruct selectUser = UserStruct(
-          id: null,
-          firstName: input['first_name'],
-          lastName: input['last_name'],
-          login: input['login'],
-          passwordHash: md5.convert(utf8.encode(input['password'])).toString());
+        id: null,
+        firstName: input['first_name'],
+        lastName: input['last_name'],
+        login: input['login'],
+        passwordHash: md5.convert(utf8.encode(input['password'])).toString(),
+        color: input['color'],
+      );
       try {
         await repos.users.add(selectUser);
       } catch (e) {
@@ -37,8 +39,8 @@ class AuthHandlers {
           id: null, owner: selectUser.id!, token: refreshToken));
       return Response.ok(jsonEncode({
         'id': selectUser.id,
-        'authToken': authToken,
-        'refreshToken': refreshToken,
+        'auth_token': authToken,
+        'refresh_token': refreshToken,
       }));
     });
 
@@ -47,7 +49,6 @@ class AuthHandlers {
       int id = await repos.users.getIdFromLoginPassword(input['login'],
           md5.convert(utf8.encode(input['password'])).toString());
       UserStruct user = await repos.users.getFromId(id);
-      print(user.colleagues);
       String authToken = generateAuthToken(user, serverSecretKey);
       String refreshToken = generateRefreshToken(user, serverSecretKey);
       await repos.refreshTokens.write(RefreshTokenStruct(
@@ -57,29 +58,29 @@ class AuthHandlers {
       ));
       return Response.ok(jsonEncode({
         'id': user.id,
-        'authToken': authToken,
-        'refreshToken': refreshToken,
+        'auth_token': authToken,
+        'refresh_token': refreshToken,
       }));
     });
 
     router.post('/reload-token', (Request request) async {
       dynamic input = jsonDecode(await request.readAsString());
       RefreshTokenStruct refreshToken =
-          await repos.refreshTokens.get(input['refreshToken']);
+          await repos.refreshTokens.get(input['refresh_token']);
       UserStruct selectUser = await repos.users.getFromId(refreshToken.owner);
       String authToken = generateAuthToken(selectUser, serverSecretKey);
       refreshToken.token = generateRefreshToken(selectUser, serverSecretKey);
       await repos.refreshTokens.rewrite(refreshToken);
       return Response.ok(jsonEncode({
         'id': selectUser.id,
-        'authToken': authToken,
-        'refreshToken': refreshToken.token
+        'auth_token': authToken,
+        'refresh_token': refreshToken.token
       }));
     });
 
     router.all(
       '/<ignored|.*>',
-      (Request request) => Response.notFound(null),
+      (Request request) => Response.notFound(''),
     );
 
     return router;

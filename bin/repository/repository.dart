@@ -1,20 +1,17 @@
 import 'package:postgres/postgres.dart';
 
-import 'folders.dart';
-import 'notifications.dart';
+import 'notify/notify.dart';
 import 'refresh_tokens.dart';
 import 'users.dart';
 
 class Repository {
   Repository(this.executor) {
     users = UsersRepository(executor, 'users');
-    notifications = NotificationsRepository(executor, 'notifications');
-    folders = FoldersRepository(executor, 'folders');
     refreshTokens = RefreshTokensRepository(executor, 'refresh_tokens');
+    notify = NotifyRepository(executor);
   }
   final PostgreSQLConnection executor;
   late UsersRepository users;
-  late NotificationsRepository notifications;
-  late FoldersRepository folders;
   late RefreshTokensRepository refreshTokens;
+  late NotifyRepository notify;
 }

@@ -51,4 +51,20 @@ class RefreshTokensRepository {
           '3': refreshToken.owner,
         });
   }
+
+  Future<void> logout(RefreshTokenStruct refreshToken) async {
+    await __executor.query(
+        'DELETE * FROM $__tableName WHERE token = @1 AND owner = @2',
+        substitutionValues: {
+          '1': refreshToken.token,
+          '2': refreshToken.owner,
+        });
+  }
+
+  Future<void> logoutAll(int owner) async {
+    await __executor.query('DELETE FROM $__tableName WHERE owner = @1',
+        substitutionValues: {
+          '1': owner,
+        });
+  }
 }

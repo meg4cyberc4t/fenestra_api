@@ -27,21 +27,22 @@ class UsersRepository {
   Future<void> add(UserStruct user) async {
     user.id = await _generateId();
     var rows = await __executor.query(
-        "INSERT INTO $__tableName (id, first_name, last_name, login, password_hash, colleagues, subscribers)"
-        " VALUES (@1, @2, @3, @4, @5, ARRAY${user.colleagues}::integer[], ARRAY${user.subscribers}::integer[]) RETURNING id",
+        "INSERT INTO $__tableName (id, first_name, last_name, login, password_hash, colleagues, subscribers, color)"
+        " VALUES (@1, @2, @3, @4, @5, ARRAY${user.colleagues}::integer[], ARRAY${user.subscribers}::integer[], @6) RETURNING id",
         substitutionValues: {
           '1': user.id,
           '2': user.firstName,
           '3': user.lastName,
           '4': user.login,
           '5': user.passwordHash,
+          '6': user.color,
         });
     user.id = rows[0][0];
   }
 
   Future<int> getIdFromLoginPassword(String login, String passwordHash) async {
     var data = await __executor.query(
-        "SELECT * FROM  $__tableName WHERE login = @1 AND password_hash = @2",
+        "SELECT id FROM  $__tableName WHERE login = @1 AND password_hash = @2",
         substitutionValues: {'1': login, '2': passwordHash});
     return data[0][0];
   }
@@ -58,9 +59,100 @@ class UsersRepository {
       passwordHash: data[0][4],
       colleagues: data[0][5],
       subscribers: data[0][6],
-      photo: data[0][7],
-      photo200: data[0][8],
+      subscriptions: data[0][7],
+      color: data[0][8],
     );
+  }
+
+  Future<void> edit(UserStruct user) async {
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET first_name = @1, last_name = @2, login = @3, "
+        "password_hash = @4, color = @5 WHERE id = @6",
+        substitutionValues: {
+          '1': user.firstName,
+          '2': user.lastName,
+          '3': user.login,
+          '4': user.passwordHash,
+          '5': user.color,
+          '6': user.id,
+        });
+  }
+
+  Future<void> addBond(UserStruct user, UserStruct bondUser) async {
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET colleagues = array_append(colleagues, @2)"
+        "WHERE id = @1",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET colleagues = array_append(colleagues, @1)"
+        "WHERE id = @2",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+  }
+
+  Future<void> deleteBond(UserStruct user, UserStruct bondUser) async {
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET colleagues = array_remove(colleagues, @2)"
+        "WHERE id = @1",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET colleagues = array_remove(colleagues, @1)"
+        "WHERE id = @2",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+  }
+
+  Future<void> addSubscriptions(UserStruct user, UserStruct bondUser) async {
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET subscriptions = array_append(subscriptions, @2)"
+        "WHERE id = @1",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET subscribers = array_append(subscribers, @1)"
+        "WHERE id = @2",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+  }
+
+  Future<void> deleteSubscriptions(UserStruct user, UserStruct bondUser) async {
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET subscriptions = array_remove(subscriptions, @2)"
+        "WHERE id = @1",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET subscribers = array_remove(subscribers, @1)"
+        "WHERE id = @2",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
   }
 
   // Future<bool> checkUniqueLogin(String login) async {
