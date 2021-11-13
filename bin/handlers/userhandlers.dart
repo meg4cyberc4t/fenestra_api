@@ -62,21 +62,21 @@ class UserHandlers {
       UserStruct subjUser = await repos.users.getFromId(subjectId);
       UserStruct selectUser =
           await repos.users.getFromId(request.context['id'] as int);
-      if (!selectUser.colleagues.contains(subjUser.id) &&
-          subjUser.subscribers.contains(selectUser.id) &&
-          selectUser.subscribers.contains(subjUser.id)) {
-        await repos.users.addSubscribers(selectUser, subjUser);
+      if (!selectUser.subscribers.contains(subjUser.id) &&
+          !selectUser.subscriptions.contains(subjUser.id) &&
+          !selectUser.colleagues.contains(subjUser.id)) {
+        await repos.users.addSubscriptions(selectUser, subjUser);
         // Если у владельца и обьекта нет связи
-      } else if (selectUser.subscribers.contains(subjUser.id)) {
-        await repos.users.deleteSubscribers(selectUser, subjUser);
-        // Если владелец подписан на обьект
-      } else if (subjUser.subscribers.contains(selectUser.id)) {
-        await repos.users.deleteSubscribers(subjUser, selectUser);
+      } else if (subjUser.subscriptions.contains(selectUser.id)) {
+        await repos.users.deleteSubscriptions(subjUser, selectUser);
         await repos.users.addBond(subjUser, selectUser);
         // Если обьект подписан на владелец
+      } else if (selectUser.subscriptions.contains(subjUser.id)) {
+        await repos.users.deleteSubscriptions(selectUser, subjUser);
+        // Если владелец подписан на обьект
       } else {
-        await repos.users.deleteBond(subjUser, selectUser);
-        await repos.users.addSubscribers(subjUser, selectUser);
+        await repos.users.deleteBond(selectUser, subjUser);
+        await repos.users.addSubscriptions(subjUser, selectUser);
         // Если владелец и субьект коллеги
       }
       return Response(201);

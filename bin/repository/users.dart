@@ -42,7 +42,7 @@ class UsersRepository {
 
   Future<int> getIdFromLoginPassword(String login, String passwordHash) async {
     var data = await __executor.query(
-        "SELECT * FROM  $__tableName WHERE login = @1 AND password_hash = @2",
+        "SELECT id FROM  $__tableName WHERE login = @1 AND password_hash = @2",
         substitutionValues: {'1': login, '2': passwordHash});
     return data[0][0];
   }
@@ -59,7 +59,8 @@ class UsersRepository {
       passwordHash: data[0][4],
       colleagues: data[0][5],
       subscribers: data[0][6],
-      color: data[0][7],
+      subscriptions: data[0][7],
+      color: data[0][8],
     );
   }
 
@@ -116,22 +117,38 @@ class UsersRepository {
         });
   }
 
-  Future<void> addSubscribers(UserStruct user, UserStruct bondUser) async {
+  Future<void> addSubscriptions(UserStruct user, UserStruct bondUser) async {
     await __executor.query(
         "UPDATE $__tableName "
-        "SET subscribers = array_append(subscribers, @2)"
+        "SET subscriptions = array_append(subscriptions, @2)"
         "WHERE id = @1",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET subscribers = array_append(subscribers, @1)"
+        "WHERE id = @2",
         substitutionValues: {
           '1': user.id,
           '2': bondUser.id,
         });
   }
 
-  Future<void> deleteSubscribers(UserStruct user, UserStruct bondUser) async {
+  Future<void> deleteSubscriptions(UserStruct user, UserStruct bondUser) async {
     await __executor.query(
         "UPDATE $__tableName "
-        "SET subscribers = array_remove(subscribers, @2)"
+        "SET subscriptions = array_remove(subscriptions, @2)"
         "WHERE id = @1",
+        substitutionValues: {
+          '1': user.id,
+          '2': bondUser.id,
+        });
+    await __executor.query(
+        "UPDATE $__tableName "
+        "SET subscribers = array_remove(subscribers, @1)"
+        "WHERE id = @2",
         substitutionValues: {
           '1': user.id,
           '2': bondUser.id,

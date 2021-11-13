@@ -62,7 +62,7 @@ class RefreshTokensRepository {
   }
 
   Future<void> logoutAll(int owner) async {
-    await __executor.query('DELETE * FROM $__tableName WHERE owner = @1',
+    await __executor.query('DELETE FROM $__tableName WHERE owner = @1',
         substitutionValues: {
           '1': owner,
         });

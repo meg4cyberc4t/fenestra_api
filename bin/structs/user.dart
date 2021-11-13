@@ -7,9 +7,11 @@ class UserStruct {
     required this.passwordHash,
     colleagues,
     subscribers,
+    subscriptions,
     required this.color,
   })  : colleagues = colleagues ?? <int>[],
-        subscribers = subscribers ?? <int>[];
+        subscribers = subscribers ?? <int>[],
+        subscriptions = subscriptions ?? <int>[];
 
   UserStruct.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -19,6 +21,7 @@ class UserStruct {
     passwordHash = json['password'];
     colleagues = json['colleagues'] ?? <int>[];
     subscribers = json['subscribers'] ?? <int>[];
+    subscriptions = json['subscriptions'] ?? <int>[];
     color = json['color'];
   }
 
@@ -29,6 +32,7 @@ class UserStruct {
   late String passwordHash;
   List<int> colleagues = <int>[];
   List<int> subscribers = <int>[];
+  List<int> subscriptions = <int>[];
   late int color;
 
   Map toMap() => {
@@ -38,6 +42,7 @@ class UserStruct {
         'login': login,
         'colleagues': colleagues,
         'subscribers': subscribers,
+        'subscriptions': subscriptions,
         'color': color,
       };
 }

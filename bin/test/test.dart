@@ -1,51 +1,79 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import '../main.dart' as server;
+// import '../main.dart' as server;
 import 'package:test/test.dart';
 
 void main() async {
-  //init server
-  await server.main();
+  // await server.main();
 
-  //testing server
   late String authToken;
   late String refreshToken;
-  group('Authorization', () {
-    test('Sign up', () async {
-      http.Response data = await http.post(
+  String defaultFirstName = "Игорь";
+  String defaultLastName = "Молчанов";
+  String defaultLogin = "login";
+  String defaultPassword = "password";
+  int defaultColor = 0;
+  late int defaultId;
+
+  String defaultFirstName2 = "Бот";
+  String defaultLastName2 = "Михаил";
+  String defaultLogin2 = "bot";
+  String defaultPassword2 = "misha";
+  int defaultColor2 = 0;
+  late int defaultId2;
+  late String defaultAuthToken2;
+
+  http.Response data;
+  dynamic input;
+
+  group('auth', () {
+    test('/sign-up #POST', () async {
+      data = await http.post(
         Uri.parse('http://localhost:8080/auth/sign-up'),
         headers: {"Content-Type": 'application/json'},
         body: jsonEncode({
-          "first_name": "Игорь",
-          "last_name": "Молчанов",
-          "login": 'login',
-          "password": 'password',
-          "color": 0
-        }),
-      );
-      if (data.statusCode != 422) {
-        expect(data.statusCode, 200);
-        Map variables = jsonDecode(data.body);
-        authToken = variables['auth_token'];
-        refreshToken = variables['refresh_token'];
-      }
-    });
-    test('Sign in', () async {
-      http.Response data = await http.post(
-        Uri.parse('http://localhost:8080/auth/sign-in'),
-        headers: {"Content-Type": 'application/json'},
-        body: jsonEncode({
-          "login": 'login',
-          "password": 'password',
+          "first_name": defaultFirstName,
+          "last_name": defaultLastName,
+          "login": defaultLogin,
+          "password": defaultPassword,
+          "color": defaultColor
         }),
       );
       expect(data.statusCode, 200);
       Map variables = jsonDecode(data.body);
       authToken = variables['auth_token'];
       refreshToken = variables['refresh_token'];
+
+      data = await http.post(Uri.parse('http://localhost:8080/auth/sign-up'),
+          headers: {"Content-Type": 'application/json'},
+          body: jsonEncode({
+            "first_name": defaultFirstName2,
+            "last_name": defaultLastName2,
+            "login": defaultLogin2,
+            "password": defaultPassword2,
+            "color": defaultColor2
+          }));
+      var input = jsonDecode(utf8.decode(data.bodyBytes));
+      defaultId2 = input['id'];
+      defaultAuthToken2 = input['auth_token'];
     });
-    test('Reload token', () async {
+    test('/sign-in #POST', () async {
+      http.Response data = await http.post(
+        Uri.parse('http://localhost:8080/auth/sign-in'),
+        headers: {"Content-Type": 'application/json'},
+        body: jsonEncode({
+          "login": defaultLogin,
+          "password": defaultPassword,
+        }),
+      );
+      expect(data.statusCode, 200);
+      Map variables = jsonDecode(data.body);
+      defaultId = variables['id'];
+      authToken = variables['auth_token'];
+      refreshToken = variables['refresh_token'];
+    });
+    test('/reload-token #POST', () async {
       http.Response data = await http.post(
         Uri.parse('http://localhost:8080/auth/reload-token'),
         headers: {"Content-Type": 'application/json'},
@@ -57,7 +85,7 @@ void main() async {
       expect(data.statusCode, 200);
     });
 
-    test('Not found', () async {
+    test('/notfound #POST', () async {
       http.Response data = await http.post(
         Uri.parse('http://localhost:8080/auth/notfound'),
         headers: {"Content-Type": 'application/json'},
@@ -67,69 +95,192 @@ void main() async {
     });
   });
 
-  //  router.get('/', (Request request) async {
-  //     UserStruct selectUser =
-  //         await repos.users.getFromId(request.context['id'] as int);
-  //     return Response.ok(jsonEncode(selectUser.toMap()));
-  //   });
+  group('users', () {
+    test('/ #GET', () async {
+      http.Response data = await http.get(
+        Uri.parse('http://localhost:8080/user/'),
+        headers: {"Authorization": authToken},
+      );
+      var input = jsonDecode(utf8.decode(data.bodyBytes));
+      expect(input['id'] != null, true);
+      expect(input['first_name'], defaultFirstName);
+      expect(input['last_name'], defaultLastName);
+      expect(input['login'], defaultLogin);
+      expect(input['colleagues'].isEmpty, true);
+      expect(input['subscribers'].isEmpty, true);
+      expect(input['color'], defaultColor);
+      expect(data.statusCode, 200);
+    });
 
-  //   router.get('/<id>', (Request request, String id) async {
-  //     late UserStruct selectUser;
-  //     try {
-  //       selectUser = await repos.users.getFromId(int.parse(id));
-  //     } catch (e) {
-  //       print(e);
-  //       return Response(404);
-  //     }
-  //     return Response.ok(jsonEncode(selectUser.toMap()));
-  //   });
+    test('/defaultId #GET', () async {
+      http.Response data = await http.get(
+        Uri.parse('http://localhost:8080/user/$defaultId'),
+        headers: {"Authorization": authToken},
+      );
+      var input = jsonDecode(utf8.decode(data.bodyBytes));
+      expect(input['id'] != null, true);
+      expect(input['first_name'], defaultFirstName);
+      expect(input['last_name'], defaultLastName);
+      expect(input['login'], defaultLogin);
+      expect(input['colleagues'].isEmpty, true);
+      expect(input['subscribers'].isEmpty, true);
+      expect(input['color'], defaultColor);
+      expect(data.statusCode, 200);
+    });
 
-  //   router.patch('/', (Request request) async {
-  //     UserStruct selectUser =
-  //         await repos.users.getFromId(request.context['id'] as int);
-  //     dynamic input = jsonDecode(await request.readAsString());
-  //     if (input['login'] != null) {
-  //       selectUser.login = input['login'];
-  //     }
-  //     if (input['first_name'] != null) {
-  //       selectUser.firstName = input['first_name'];
-  //     }
-  //     if (input['last_name'] != null) {
-  //       selectUser.lastName = input['last_name'];
-  //     }
-  //     if (input['password'] != null) {
-  //       selectUser.passwordHash =
-  //           md5.convert(utf8.encode(input['password'])).toString();
-  //       repos.refreshTokens.logoutAll(selectUser.id!);
-  //     }
-  //     if (input['color'] != null) {
-  //       selectUser.color = input['color'];
-  //     }
-  //     repos.users.edit(selectUser);
-  //     return Response.ok(jsonEncode(selectUser.toMap()));
-  //   });
+    test('/-defaultId #GET', () async {
+      http.Response data = await http.get(
+        Uri.parse('http://localhost:8080/user/-$defaultId'),
+        headers: {"Authorization": authToken},
+      );
+      expect(data.statusCode, 404);
+      expect(data.body, '');
+    });
 
-  //   router.get('/<id>/bond', (Request request, String id) async {
-  //     int subjectId = int.parse(id);
-  //     UserStruct subjUser = await repos.users.getFromId(subjectId);
-  //     UserStruct selectUser =
-  //         await repos.users.getFromId(request.context['id'] as int);
-  //     if (!selectUser.colleagues.contains(subjUser.id) &&
-  //         subjUser.subscribers.contains(selectUser.id) &&
-  //         selectUser.subscribers.contains(subjUser.id)) {
-  //       await repos.users.addSubscribers(selectUser, subjUser);
-  //       // Если у владельца и обьекта нет связи
-  //     } else if (selectUser.subscribers.contains(subjUser.id)) {
-  //       await repos.users.deleteSubscribers(selectUser, subjUser);
-  //       // Если владелец подписан на обьект
-  //     } else if (subjUser.subscribers.contains(selectUser.id)) {
-  //       await repos.users.deleteSubscribers(subjUser, selectUser);
-  //       await repos.users.addBond(subjUser, selectUser);
-  //       // Если обьект подписан на владелец
-  //     } else {
-  //       await repos.users.deleteBond(subjUser, selectUser);
-  //       await repos.users.addSubscribers(subjUser, selectUser);
-  //       // Если владелец и субьект коллеги
-  //     }
-  //     return Response(201);
+    test('/ #PATCH', () async {
+      http.Response data = await http.patch(
+        Uri.parse('http://localhost:8080/user/'),
+        headers: {
+          "Authorization": authToken,
+          "Content-Type": 'application/json',
+        },
+        body: jsonEncode({
+          "first_name": defaultFirstName + '1',
+          "last_name": defaultLastName + '1',
+          "login": defaultLogin + '1',
+          "password": defaultPassword + '1',
+          "color": defaultColor + 1,
+        }),
+      );
+      var input = jsonDecode(utf8.decode(data.bodyBytes));
+      expect(input['id'] != null, true);
+      expect(input['first_name'], defaultFirstName + '1');
+      expect(input['last_name'], defaultLastName + '1');
+      expect(input['login'], defaultLogin + '1');
+      expect(input['color'], defaultColor + 1);
+      expect(data.statusCode, 200);
+
+      data = await http.get(
+        Uri.parse('http://localhost:8080/user/'),
+        headers: {"Authorization": authToken},
+      );
+      input = jsonDecode(utf8.decode(data.bodyBytes));
+      expect(input['id'] != null, true);
+      expect(input['first_name'], defaultFirstName + '1');
+      expect(input['last_name'], defaultLastName + '1');
+      expect(input['login'], defaultLogin + '1');
+      expect(input['color'], defaultColor + 1);
+      expect(data.statusCode, 200);
+      await http.patch(
+        Uri.parse('http://localhost:8080/user/'),
+        headers: {
+          "Authorization": authToken,
+          "Content-Type": 'application/json',
+        },
+        body: jsonEncode({
+          "first_name": defaultFirstName,
+          "last_name": defaultLastName,
+          "login": defaultLogin,
+          "password": defaultPassword,
+          "color": defaultColor,
+        }),
+      );
+      data = await http.post(
+        Uri.parse('http://localhost:8080/auth/reload-token'),
+        headers: {"Content-Type": 'application/json'},
+        body: jsonEncode({
+          "refresh_token": refreshToken,
+        }),
+      );
+      expect(data.statusCode, 403);
+      data = await http.post(
+        Uri.parse('http://localhost:8080/auth/sign-in'),
+        headers: {"Content-Type": 'application/json'},
+        body: jsonEncode({
+          "login": defaultLogin,
+          "password": defaultPassword,
+        }),
+      );
+      expect(data.statusCode, 200);
+      Map variables = jsonDecode(data.body);
+      defaultId = variables['id'];
+      authToken = variables['auth_token'];
+      refreshToken = variables['refresh_token'];
+    });
+    group('/default/bond #GET', () {
+      test('Subscribe', () async {
+        data = await http.get(
+          Uri.parse('http://localhost:8080/user/$defaultId2/bond'),
+          headers: {"Authorization": authToken},
+        );
+        expect(data.statusCode, 201);
+
+        data = await http.get(
+          Uri.parse('http://localhost:8080/user/$defaultId2'),
+          headers: {"Authorization": authToken},
+        );
+        input = jsonDecode(utf8.decode(data.bodyBytes));
+        expect(input['subscribers'].contains(defaultId), true);
+        data =
+            await http.get(Uri.parse('http://localhost:8080/user/'), headers: {
+          "Authorization": authToken,
+        });
+        input = jsonDecode(utf8.decode(data.bodyBytes));
+        expect(input['subscriptions'].contains(defaultId2), true);
+      });
+
+      test('Delete subscribe', () async {
+        http.Response data = await http.get(
+          Uri.parse('http://localhost:8080/user/$defaultId2/bond'),
+          headers: {"Authorization": authToken},
+        );
+        expect(data.statusCode, 201);
+        data = await http.get(
+          Uri.parse('http://localhost:8080/user/$defaultId2'),
+          headers: {"Authorization": authToken},
+        );
+        var input = jsonDecode(utf8.decode(data.bodyBytes));
+        expect(input['subscriptions'].contains(defaultId2), false);
+        expect(input['subscribers'].contains(defaultId2), false);
+        expect(input['colleagues'].contains(defaultId2), false);
+        data = await http.get(
+          Uri.parse('http://localhost:8080/user/'),
+          headers: {"Authorization": authToken},
+        );
+        input = jsonDecode(utf8.decode(data.bodyBytes));
+        expect(input['subscriptions'].contains(defaultId), false);
+        expect(input['subscribers'].contains(defaultId), false);
+        expect(input['colleagues'].contains(defaultId), false);
+      });
+
+      test('Add bond', () async {
+        await http.get(
+          Uri.parse('http://localhost:8080/user/$defaultId2/bond'),
+          headers: {"Authorization": authToken},
+        );
+        await http.get(
+          Uri.parse('http://localhost:8080/user/$defaultId/bond'),
+          headers: {"Authorization": defaultAuthToken2},
+        );
+
+        data = await http.get(
+          Uri.parse('http://localhost:8080/user/'),
+          headers: {"Authorization": authToken},
+        );
+        input = jsonDecode(utf8.decode(data.bodyBytes));
+        expect(input['subscriptions'].contains(defaultId2), false);
+        expect(input['subscribers'].contains(defaultId2), false);
+        expect(input['colleagues'].contains(defaultId2), true);
+
+        data = await http.get(
+          Uri.parse('http://localhost:8080/user/'),
+          headers: {"Authorization": defaultAuthToken2},
+        );
+        input = jsonDecode(utf8.decode(data.bodyBytes));
+        expect(input['subscriptions'].contains(defaultId), false);
+        expect(input['subscribers'].contains(defaultId), false);
+        expect(input['colleagues'].contains(defaultId), true);
+      });
+    });
+  });
 }
