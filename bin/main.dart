@@ -2,7 +2,7 @@ import 'package:postgres/postgres.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'extensions/dotnetmethods.dart';
+import 'extensions/dotenvmethods.dart';
 import 'extensions/ymlmethods.dart';
 import 'handlers/middleware.dart';
 import 'handlers/authhandlers.dart';
@@ -41,7 +41,7 @@ class Service {
   }
 }
 
-void main() async {
+Future<void> main() async {
   loadEnv();
   Map serverConfig = await loadYamlFile('bin/configs/config.yml');
   PostgreSQLConnection connection = PostgreSQLConnection(
@@ -60,5 +60,5 @@ void main() async {
     serverConfig['server']['host'],
     serverConfig['server']['port'],
   );
-  print('Server running on ${server.address}:${server.port}');
+  print("Server running on ${server.address}:${server.port}");
 }

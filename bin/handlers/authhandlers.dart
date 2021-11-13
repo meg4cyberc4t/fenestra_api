@@ -39,8 +39,8 @@ class AuthHandlers {
           id: null, owner: selectUser.id!, token: refreshToken));
       return Response.ok(jsonEncode({
         'id': selectUser.id,
-        'authToken': authToken,
-        'refreshToken': refreshToken,
+        'auth_token': authToken,
+        'refresh_token': refreshToken,
       }));
     });
 
@@ -58,29 +58,29 @@ class AuthHandlers {
       ));
       return Response.ok(jsonEncode({
         'id': user.id,
-        'authToken': authToken,
-        'refreshToken': refreshToken,
+        'auth_token': authToken,
+        'refresh_token': refreshToken,
       }));
     });
 
     router.post('/reload-token', (Request request) async {
       dynamic input = jsonDecode(await request.readAsString());
       RefreshTokenStruct refreshToken =
-          await repos.refreshTokens.get(input['refreshToken']);
+          await repos.refreshTokens.get(input['refresh_token']);
       UserStruct selectUser = await repos.users.getFromId(refreshToken.owner);
       String authToken = generateAuthToken(selectUser, serverSecretKey);
       refreshToken.token = generateRefreshToken(selectUser, serverSecretKey);
       await repos.refreshTokens.rewrite(refreshToken);
       return Response.ok(jsonEncode({
         'id': selectUser.id,
-        'authToken': authToken,
-        'refreshToken': refreshToken.token
+        'auth_token': authToken,
+        'refresh_token': refreshToken.token
       }));
     });
 
     router.all(
       '/<ignored|.*>',
-      (Request request) => Response.notFound(null),
+      (Request request) => Response.notFound(''),
     );
 
     return router;

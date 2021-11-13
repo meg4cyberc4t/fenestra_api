@@ -9,30 +9,33 @@ CREATE TABLE "users" (
 	"color" integer NOT NULL CHECK(color >=0 AND color <= 16777215)
 );
 
-CREATE TABLE "notifications" (
-	"id" integer UNIQUE PRIMARY KEY,
-	"title" varchar(255) NOT NULL,
-	"description" varchar(255) NOT NULL,
-	"owner" integer NOT NULL,
-	"deadline" TIMESTAMP WITH TIME ZONE NOT NULL,
-	"repeat" smallint
-);
-
-CREATE TABLE "folders" (
-	"id" integer UNIQUE PRIMARY KEY,
-	"owner" integer NOT NULL,
-	"participants" integer[] DEFAULT ARRAY[]::integer[], 
-	"title" varchar(255) NOT NULL,
-	"description" varchar(255) NOT NULL,
-	"priority" smallint DEFAULT 0
-);
-
 CREATE TABLE "refresh_tokens" (
 	"id" integer UNIQUE PRIMARY KEY,
 	"owner" integer NOT NULL,
 	"token" varchar NOT NULL
 );
 
-ALTER TABLE "notifications" ADD CONSTRAINT "notifications_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");
 ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");
-ALTER TABLE "folders" ADD CONSTRAINT "folders_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");
+
+
+CREATE TABLE "notify_notifications" (
+	"id" integer UNIQUE PRIMARY KEY,
+	"owner" integer NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"description" varchar(255) NOT NULL,
+	"deadline" TIMESTAMP WITH TIME ZONE NOT NULL,
+	"repeat" smallint
+);
+
+ALTER TABLE "notify_notifications" ADD CONSTRAINT "notify_notifications_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");
+
+CREATE TABLE "notify_folders" (
+	"id" integer UNIQUE PRIMARY KEY,
+	"owner" integer NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"description" varchar(255) NOT NULL,
+	"participants" integer[] DEFAULT ARRAY[]::integer[], 
+	"priority" smallint DEFAULT 0
+);
+
+ALTER TABLE "notify_folders" ADD CONSTRAINT "notify_folders_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");

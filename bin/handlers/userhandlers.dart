@@ -84,7 +84,7 @@ class UserHandlers {
 
     router.all(
       '/<ignored|.*>',
-      (Request request) => Response.notFound('Resource not found'),
+      (Request request) => Response.notFound(''),
     );
 
     return router;
