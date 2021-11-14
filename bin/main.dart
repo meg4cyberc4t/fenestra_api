@@ -6,6 +6,7 @@ import 'extensions/dotenvmethods.dart';
 import 'extensions/ymlmethods.dart';
 import 'handlers/middleware.dart';
 import 'handlers/authhandlers.dart';
+import 'handlers/notify/notifyhandlers.dart';
 import 'handlers/userhandlers.dart';
 import 'repository/repository.dart';
 import 'package:dotenv/dotenv.dart' show env;
@@ -26,12 +27,20 @@ class Service {
             .addHandler(AuthHandlers(repos, serverSecretKey).router));
 
     router.mount(
-        '/user/',
+        '/users/',
         Pipeline()
             .addMiddleware(setJsonHeader())
             .addMiddleware(handleErrors())
             .addMiddleware(handleAuth(serverSecretKey))
             .addHandler(UserHandlers(repos).router));
+
+    router.mount(
+        '/notify/',
+        Pipeline()
+            .addMiddleware(setJsonHeader())
+            .addMiddleware(handleErrors())
+            .addMiddleware(handleAuth(serverSecretKey))
+            .addHandler(NotifyHandlers(repos).router));
 
     router.all(
       '/<ignored|.*>',
