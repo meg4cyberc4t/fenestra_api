@@ -13,10 +13,13 @@ log:
 	git log --pretty=format:'%h %Cgreen %cr %Creset %aN %Cred %s %Creset |'
 
 test:
-	migrate -path schema/ -database "postgres://postgres:SUPERPASSWORD@localhost:5432/postgres?sslmode=disable" down -all
-	migrate -path schema/ -database "postgres://postgres:SUPERPASSWORD@localhost:5432/postgres?sslmode=disable" up
-	echo "------------------"
-	clear
-	dart run bin/test/test.dart --chain-stack-traces
+	cd ..
+	cd mega_api
+	migrate -path schema/ -database "postgres://postgres:SUPERPASSWORD@localhost:5432/postgres?sslmode=disable" down --all;
+	migrate -path schema/ -database "postgres://postgres:SUPERPASSWORD@localhost:5432/postgres?sslmode=disable" up;
+	echo "------------------";
+	clear;
+	cd ..
+	cd megasdkdart
+	dart run test/megasdkdart_test.dart --chain-stack-traces;
 
-	

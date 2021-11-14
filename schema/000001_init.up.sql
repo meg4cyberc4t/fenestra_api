@@ -19,8 +19,6 @@ CREATE TABLE "refresh_tokens" (
 ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");
 
 
-
-
 CREATE TABLE "notify_folders" (
 	"id" integer UNIQUE PRIMARY KEY,
 	"owner" integer NOT NULL,
@@ -36,10 +34,11 @@ CREATE TABLE "notify_notifications" (
 	"id" integer UNIQUE PRIMARY KEY,
 	"owner" integer NOT NULL,
 	"title" varchar(255) NOT NULL,
-	"description" varchar(255) NOT NULL,
-	"deadline" TIMESTAMP WITH TIME ZONE NOT NULL,
+	"description" varchar(255),
+	"deadline" bigint,
 	"repeat" smallint,
-	"folder" integer
+	"folder" integer,
+	"invited" integer[] DEFAULT ARRAY[]::integer[]
 );
 
 ALTER TABLE "notify_notifications" ADD CONSTRAINT "notify_notifications_fk0" FOREIGN KEY ("owner") REFERENCES "users"("id");

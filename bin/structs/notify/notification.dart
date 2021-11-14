@@ -6,6 +6,8 @@ class NotificationStruct {
     required this.owner,
     required this.deadline,
     required this.repeat,
+    required this.folder,
+    required this.invited,
   });
 
   NotificationStruct.fromJson(Map<String, dynamic> json) {
@@ -13,14 +15,29 @@ class NotificationStruct {
     title = json['title'];
     description = json['description'];
     owner = json['owner'];
-    deadline = DateTime.fromMillisecondsSinceEpoch(json['deadline']);
+    deadline = json['deadline'];
     repeat = json['repeat'];
+    folder = json['folder'];
+    invited = json['invited'];
   }
 
-  late int id;
+  Map toMap() => {
+        "id": id,
+        "title": title,
+        "description": description,
+        "owner": owner,
+        "deadline": deadline,
+        "repeat": repeat,
+        "folder": folder,
+        "invited": invited,
+      };
+
+  late int? id;
   late String title;
-  late String description;
+  late String? description;
   late int owner;
-  late DateTime deadline;
-  late int repeat;
+  late int? deadline;
+  late int? repeat;
+  late int? folder;
+  late List<int> invited;
 }

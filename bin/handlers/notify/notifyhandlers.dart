@@ -4,6 +4,7 @@ import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf.dart';
 
 import 'folderhandlers.dart';
+import 'notificationhandlers.dart';
 
 class NotifyHandlers {
   const NotifyHandlers(this.repos);
@@ -13,6 +14,8 @@ class NotifyHandlers {
     final router = Router();
 
     router.mount('/folders/', FolderHandlers(repos).router);
+
+    router.mount('/notifications/', NotificationsHandlers(repos).router);
 
     router.all(
       '/<ignored|.*>',
