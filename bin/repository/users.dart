@@ -154,37 +154,4 @@ class UsersRepository {
           '2': bondUser.id,
         });
   }
-
-  // Future<bool> checkUniqueLogin(String login) async {
-  //   var rows = await __executor.query(__tableName,
-  //       'SELECT * FROM $__tableName WHERE login = @1', {'1': login});
-  //   return rows.isEmpty;
-  // }
-
-  // Future<int> getIdByLogin(String login) async {
-  //   var rows = await __executor.query(__tableName,
-  //       'SELECT id FROM $__tableName WHERE login = @1', {'1': login});
-  //   return rows[0][0];
-  // }
-
-  // Future<int> getLoginById(int id) async {
-  //   var rows = await __executor.query(
-  //       __tableName, 'SELECT login FROM $__tableName WHERE id = @1', {'1': id});
-  //   return rows[0][0];
-  // }
-
-  // Future<UserStruct> getFromId(int id) async {
-  //   var rows = await __executor.query(
-  //       __tableName, 'SELECT * FROM $__tableName WHERE id = @1', {'1': id});
-  //   return UserStruct(
-  //     id: rows[0][0],
-  //     name: rows[0][1],
-  //     login: rows[0][2],
-  //     passwordHash: rows[0][3],
-  //   );
-  // }
-
-  // Future<UserStruct> getFromLogin(String login) async {
-  //   return await getFromId(await getIdByLogin(login));
-  // }
 }
