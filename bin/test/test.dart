@@ -58,6 +58,7 @@ void main() async {
       defaultId2 = input['id'];
       defaultAuthToken2 = input['auth_token'];
     });
+
     test('/sign-in #POST', () async {
       http.Response data = await http.post(
         Uri.parse('http://localhost:8080/auth/sign-in'),
@@ -83,15 +84,6 @@ void main() async {
       );
       refreshToken = jsonDecode(data.body)['refresh_token'];
       expect(data.statusCode, 200);
-    });
-
-    test('/notfound #POST', () async {
-      http.Response data = await http.post(
-        Uri.parse('http://localhost:8080/auth/notfound'),
-        headers: {"Content-Type": 'application/json'},
-      );
-      expect(data.statusCode, 404);
-      expect(data.body, '');
     });
   });
 
@@ -126,15 +118,6 @@ void main() async {
       expect(input['subscribers'].isEmpty, true);
       expect(input['color'], defaultColor);
       expect(data.statusCode, 200);
-    });
-
-    test('/-defaultId #GET', () async {
-      http.Response data = await http.get(
-        Uri.parse('http://localhost:8080/user/-$defaultId'),
-        headers: {"Authorization": authToken},
-      );
-      expect(data.statusCode, 404);
-      expect(data.body, '');
     });
 
     test('/ #PATCH', () async {
@@ -186,14 +169,6 @@ void main() async {
         }),
       );
       data = await http.post(
-        Uri.parse('http://localhost:8080/auth/reload-token'),
-        headers: {"Content-Type": 'application/json'},
-        body: jsonEncode({
-          "refresh_token": refreshToken,
-        }),
-      );
-      expect(data.statusCode, 403);
-      data = await http.post(
         Uri.parse('http://localhost:8080/auth/sign-in'),
         headers: {"Content-Type": 'application/json'},
         body: jsonEncode({
@@ -207,6 +182,7 @@ void main() async {
       authToken = variables['auth_token'];
       refreshToken = variables['refresh_token'];
     });
+
     group('/default/bond #GET', () {
       test('Subscribe', () async {
         data = await http.get(
@@ -280,6 +256,116 @@ void main() async {
         expect(input['subscriptions'].contains(defaultId), false);
         expect(input['subscribers'].contains(defaultId), false);
         expect(input['colleagues'].contains(defaultId), true);
+      });
+    });
+  });
+  group('Notify', () {
+    group('folders', () {
+      test('/ #GET', () async {
+        data = await http.get(
+          Uri.parse('http://localhost:8080/notify/folder/'),
+          headers: {"Authorization": authToken},
+        );
+        expect(data.statusCode, 200);
+        expect(jsonDecode(utf8.decode(data.bodyBytes)) is List, true);
+        expect(jsonDecode(utf8.decode(data.bodyBytes)).isEmpty, true);
+      });
+
+      late int folderid;
+      test('/ #POST', () async {
+        data = await http.post(
+          Uri.parse('http://localhost:8080/notify/folder/'),
+          headers: {"Authorization": authToken},
+          body: jsonEncode({
+            "title": "Тестовое название",
+            "description": "Тестовое описание",
+            "priority": 0,
+          }),
+        );
+        expect(data.statusCode, 200);
+        expect(jsonDecode(utf8.decode(data.bodyBytes))['id'] is int, true);
+        data = await http.get(
+          Uri.parse('http://localhost:8080/notify/folder/'),
+          headers: {"Authorization": authToken},
+        );
+        expect(data.statusCode, 200);
+        expect(jsonDecode(utf8.decode(data.bodyBytes)) is List, true);
+        expect(jsonDecode(utf8.decode(data.bodyBytes)).isEmpty, false);
+        Map selectFolder = jsonDecode(utf8.decode(data.bodyBytes))[0];
+        expect(selectFolder['id'] != null, true);
+        expect(selectFolder['owner'] != null, true);
+        expect(selectFolder['title'] != null, true);
+        expect(selectFolder['description'] != null, true);
+        expect(selectFolder['participants'] != null, true);
+        expect(selectFolder['priority'] != null, true);
+        folderid = selectFolder['id'];
+      });
+
+      test('/<id> #GET', () async {
+        data = await http.get(
+          Uri.parse('http://localhost:8080/notify/folder/$folderid'),
+          headers: {"Authorization": authToken},
+        );
+        expect(data.statusCode, 200);
+        Map selectFolder = jsonDecode(utf8.decode(data.bodyBytes));
+        expect(selectFolder['id'] != null, true);
+        expect(selectFolder['owner'] != null, true);
+        expect(selectFolder['title'] != null, true);
+        expect(selectFolder['description'] != null, true);
+        expect(selectFolder['participants'] != null, true);
+        expect(selectFolder['priority'] != null, true);
+      });
+
+      test('/<id> #DELETE', () async {
+        data = await http.delete(
+          Uri.parse('http://localhost:8080/notify/folder/$folderid'),
+          headers: {"Authorization": authToken},
+        );
+        expect(data.statusCode, 201);
+
+        data = await http.get(
+          Uri.parse('http://localhost:8080/notify/folder/'),
+          headers: {"Authorization": authToken},
+        );
+        expect(data.statusCode, 200);
+        expect(jsonDecode(utf8.decode(data.bodyBytes)) is List, true);
+        expect(jsonDecode(utf8.decode(data.bodyBytes)).isEmpty, true);
+      });
+      test('/<id> #PATCH', () async {
+        data = await http.post(
+          Uri.parse('http://localhost:8080/notify/folder/'),
+          headers: {"Authorization": authToken},
+          body: jsonEncode({
+            "title": "test",
+            "description": "dtest",
+            "priority": 0,
+          }),
+        );
+        int id = jsonDecode(utf8.decode(data.bodyBytes))['id'];
+        data = await http.patch(
+            Uri.parse('http://localhost:8080/notify/folder/$id'),
+            headers: {"Authorization": authToken},
+            body: jsonEncode({
+              "title": "test1",
+              "description": "dtest1",
+              "priority": 1,
+            }));
+        expect(data.statusCode, 200);
+
+        data = await http.get(
+          Uri.parse('http://localhost:8080/notify/folder/$id'),
+          headers: {"Authorization": authToken},
+        );
+        Map selectFolder = jsonDecode(utf8.decode(data.bodyBytes));
+        expect(selectFolder['id'] != null, true);
+        expect(selectFolder['owner'] != null, true);
+        expect(selectFolder['title'] != null, true);
+        expect(selectFolder['description'] != null, true);
+        expect(selectFolder['participants'] != null, true);
+        expect(selectFolder['priority'] != null, true);
+        expect(selectFolder['title'], 'test1');
+        expect(selectFolder['description'], 'dtest1');
+        expect(selectFolder['priority'], 1);
       });
     });
   });
