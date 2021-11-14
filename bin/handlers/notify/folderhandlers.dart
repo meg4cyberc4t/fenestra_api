@@ -36,7 +36,7 @@ class FolderHandlers {
       FolderStruct folder = FolderStruct(
           title: input['title'],
           description: input['description'],
-          priority: input['priority'],
+          priority: input['priority'] ?? 0,
           id: null,
           participants: <int>[],
           owner: request.context['id'] as int);
@@ -86,7 +86,9 @@ class FolderHandlers {
           await repos.notify.folders.getById(ownerUser, folderId);
       dynamic input = jsonDecode(await request.readAsString());
       UserStruct inviteUser = await repos.users.getFromId(input['id']);
-      await repos.notify.folders.invite(inviteUser, selectFolder);
+      if (!selectFolder.participants.contains(inviteUser.id)) {
+        await repos.notify.folders.invite(inviteUser, selectFolder);
+      }
       return Response(201);
     });
 
@@ -98,7 +100,9 @@ class FolderHandlers {
           await repos.notify.folders.getById(ownerUser, folderId);
       dynamic input = jsonDecode(await request.readAsString());
       UserStruct excludeUser = await repos.users.getFromId(input['id']);
-      await repos.notify.folders.exclude(excludeUser, selectFolder);
+      if (selectFolder.participants.contains(excludeUser.id)) {
+        await repos.notify.folders.exclude(excludeUser, selectFolder);
+      }
       return Response(201);
     });
 

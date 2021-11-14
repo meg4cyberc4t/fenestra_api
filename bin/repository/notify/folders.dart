@@ -12,7 +12,7 @@ class FoldersRepository {
 
   Future<List<FolderStruct>> get(UserStruct user) async {
     var rows = await __executor.query(
-        'SELECT * FROM $__tableName WHERE owner = @1 OR @1 = ANY(participants)',
+        'SELECT * FROM $__tableName WHERE owner = @1 OR ANY(participants) = @1',
         substitutionValues: {'1': user.id});
     List<FolderStruct> data = [];
     for (var e in rows) {

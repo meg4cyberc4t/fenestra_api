@@ -25,7 +25,7 @@ CREATE TABLE "notify_folders" (
 	"id" integer UNIQUE PRIMARY KEY,
 	"owner" integer NOT NULL,
 	"title" varchar(255) NOT NULL,
-	"description" varchar(255) NOT NULL,
+	"description" varchar(255),
 	"participants" integer[] DEFAULT ARRAY[]::integer[], 
 	"priority" smallint DEFAULT 0
 );

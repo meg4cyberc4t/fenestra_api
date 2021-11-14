@@ -19,7 +19,7 @@ class FolderStruct {
   late int? id;
   late int owner;
   late String title;
-  late String description;
+  late String? description;
   late List<int> participants;
   late int priority;
 

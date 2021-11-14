@@ -12,7 +12,7 @@ class NotifyHandlers {
   Router get router {
     final router = Router();
 
-    router.mount('/folder/', FolderHandlers(repos).router);
+    router.mount('/folders/', FolderHandlers(repos).router);
 
     router.all(
       '/<ignored|.*>',

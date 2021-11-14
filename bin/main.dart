@@ -27,7 +27,7 @@ class Service {
             .addHandler(AuthHandlers(repos, serverSecretKey).router));
 
     router.mount(
-        '/user/',
+        '/users/',
         Pipeline()
             .addMiddleware(setJsonHeader())
             .addMiddleware(handleErrors())
