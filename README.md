@@ -1,4 +1,4 @@
-# notify-api
+# mega_api
 
 ## Information for developers
 
@@ -11,7 +11,4 @@
 
 ### Also important
 - make migration_down (Discard migrations)
-
-## P.s.
-
-- bash script "wait-for-postgres.sh" can help when absolutely the entire application system will be launched from the docker. I currently have a server running separately, but that doesn't mean I won't want to do everything in one big docker in the future))
+- make log (beautiful git log)
