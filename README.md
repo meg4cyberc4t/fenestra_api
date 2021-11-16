@@ -12,3 +12,6 @@
 ### Also important
 - make migration_down (Discard migrations)
 - make log (beautiful git log)
+
+### You can also use the sdk to use the api in your projects
+https://github.com/meg4cyberc4t/megasdkdart
