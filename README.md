@@ -207,14 +207,138 @@ int id; // id напоминания (Уникальное значение)
 String title; // Название напоминания
 String? description; // Описание напомнания (Может быть null)
 int owner; // id создателя напомнания 
-int? deadline; // Время дедлайна в timestamp (milliseconds after epoch)
+int? deadline; // Время дедлайна в timestamp (milliseconds after epoch, может быть null)
 int? repeat; // Повторяется ли напоминание (число 0 до 127 включительно, может быть null)
 int? folder;  // id папки напоминаний (Может быть null)
 List<int> invited; // Список пользователей, с которыми поделились напоминанием
 ```
 ---
-### Метод получения всех напоминаний пользователя:
+### Метод создания нового напоминания:
+#### Path
+```/notify/notifications/```
+#### Method
+```POST```
+#### Body example
+```json
+{
+  "title": "title"
+  "description": "desc",
+  "deadline": 1637154816,
+  "repeat" 124,
+}
+```
+! repeat - десятичное отображение повторений. Значение 124 -> в десятичную систему 1111100 -> повторение по будним дням (начало недели с понедельника)!
+#### Answer example
+```json
+{
+    "id": 1
+}
+```
+---
+### Метод получения напоминания по id:
+#### Path
+```/notify/notifications/132904669```
+#### Method
+```GET```
+#### Body example
+```json
+{
+    "id": 132904669,
+    "title": "yourtitle",
+    "description": null,
+    "owner": 484911188,
+    "deadline": 1637154816,
+    "repeat": null,
+    "folder": null,
+    "invited": []
+}
+```
+---
+### Метод получения всех напоминаний:
 #### Path
 ```/notify/notifications/```
 #### Method
 ```GET```
+#### Body example
+```json
+[
+    {
+        "id": 546433423,
+        "title": "yourtitle",
+        "description": null,
+        "owner": 484911188,
+        "deadline": null,
+        "repeat": null,
+        "folder": null,
+        "invited": []
+    },
+]
+```
+---
+### Метод получения всех напоминаний в определённой папке:
+#### Path
+```/notify/byFolder/1```
+#### Method
+```GET```
+#### Body example
+```json
+[
+    {
+        "id": 546433423,
+        "title": "yourtitle",
+        "description": null,
+        "owner": 484911188,
+        "deadline": null,
+        "repeat": null,
+        "folder": null,
+        "invited": []
+    },
+]
+```
+---
+### Метод редактирования напоминания:
+#### Path
+```/notify/notifications/```
+#### Method
+```PATCH```
+#### Body example
+```json
+{
+  "title": "title"
+  "description": "desc",
+  "deadline": 1637154816,
+  "repeat" 124,
+}
+```
+! repeat - десятичное отображение повторений. Значение 124 -> в десятичную систему 1111100 -> повторение по будним дням (начало недели с понедельника)!
+#### Answer example
+```json
+{
+    "id": 132904669,
+    "title": "title",
+    "description": "desc",
+    "owner": 484911188,
+    "deadline": 1637154816,
+    "repeat": 124,
+    "folder": null,
+    "invited": []
+}
+```
+---
+### Метод удаления напоминания:
+#### Path
+```/notify/notifications/2```
+#### Method
+```DELETE```
+---
+### Метод для того, чтоб поделиться напоминани:
+#### Path
+```/notify/notifications/1/invite```
+#### Method
+```POST```
+#### Body example
+```json
+{
+  "id": 12345678,
+}
+```
