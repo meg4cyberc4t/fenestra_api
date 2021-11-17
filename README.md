@@ -23,6 +23,7 @@ https://github.com/meg4cyberc4t/megasdkdart
 ```
 200 - Всё хорошо
 201 - Всё хорошо, но нет информации, которую серверу надо вернуть (aka. Правильный запрос с пустым ответом)
+401 - Без авторизации (Перезагрузите auth_token или снова выполните авторизацию пользователя)
 403 - Метод не реализован (Сервер не может выполнить запрос, проверьте правильность введённых данных)
 422 - Данные уже используются (Когда вы пытаетесь создать пользователя с login, который уже задействован в системе)
 ```
@@ -334,6 +335,108 @@ List<int> invited; // Список пользователей, с которым
 ### Метод для того, чтоб поделиться напоминани:
 #### Path
 ```/notify/notifications/1/invite```
+#### Method
+```POST```
+#### Body example
+```json
+{
+  "id": 12345678,
+}
+```
+---
+### Структура Папки
+```dart
+int? id; // id папки (уникальное значение)
+int owner; // id создателя папки
+String title; // Название папки
+String? description; // Описание папки
+List<int> participants; // Список участников папки (без создателя)
+int priority; // Приоритет папки (число от 1 до 3)
+```
+---
+### Метод создания новой папки:
+#### Path
+```/notify/folders/```
+#### Method
+```POST```
+#### Body example
+```json
+{
+  "title": "title"
+  "description": "desc",
+  "priority": 1,
+}
+```
+#### Answer example
+```json
+{
+    "id": 1
+}
+```
+---
+### Метод получения папки по id:
+#### Path
+```/notify/folders/132904669```
+#### Method
+```GET```
+#### Body example
+```json
+{
+    "id": 1936269559,
+    "owner": 484911188,
+    "title": "title",
+    "description": "desc",
+    "participants": [],
+    "priority": 0
+}
+```
+---
+### Метод редактирования папки:
+#### Path
+```/notify/folders/1```
+#### Method
+```PATCH```
+#### Body example
+```json
+{
+  "title": "title",
+  "description": "desc",
+  "priority": 1
+}
+```
+#### Answer example
+```json
+{
+    "id": 1936269559,
+    "owner": 484911188,
+    "title": "title",
+    "description": "desc",
+    "participants": [],
+    "priority": 1
+}
+```
+---
+### Метод удаления напоминания:
+#### Path
+```/notify/folders/2```
+#### Method
+```DELETE```
+---
+### Метод для того, чтоб пригласить пользователя в папку:
+#### Path
+```/notify/folders/1/invite```
+#### Method
+```POST```
+#### Body example
+```json
+{
+  "id": 12345678,
+}
+```
+---
+### Метод для того, чтоб пригласить пользователя в папку:
+#### Path
+```/notify/folders/1/exclude```
 #### Method
 ```POST```
 #### Body example
