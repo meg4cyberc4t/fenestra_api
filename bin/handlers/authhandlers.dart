@@ -20,6 +20,9 @@ class AuthHandlers {
 
     router.post('/signUp', (Request request) async {
       var input = jsonDecode(await request.readAsString());
+      if (!checkCorrectLogin(input['login'])) {
+        return Response(403);
+      }
       UserStruct selectUser = UserStruct(
         id: null,
         firstName: input['first_name'],
