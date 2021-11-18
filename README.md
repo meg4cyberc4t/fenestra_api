@@ -23,6 +23,7 @@ https://github.com/meg4cyberc4t/megasdkdart
 ```
 200 - Всё хорошо
 201 - Всё хорошо, но нет информации, которую серверу надо вернуть (aka. Правильный запрос с пустым ответом)
+202 - Принято
 401 - Без авторизации (Перезагрузите auth_token или снова выполните авторизацию пользователя)
 403 - Метод не реализован (Сервер не может выполнить запрос, проверьте правильность введённых данных)
 422 - Данные уже используются (Когда вы пытаетесь создать пользователя с login, который уже задействован в системе)
@@ -38,7 +39,7 @@ https://github.com/meg4cyberc4t/megasdkdart
 
 ### Метод регистрации: 
 #### Path
-```/auth/sign-up```
+```/auth/signUp```
 #### Method
 ```POST```
 #### Body example
@@ -63,7 +64,7 @@ https://github.com/meg4cyberc4t/megasdkdart
 ---
 ### Метод авторизации: 
 #### Path
-```/auth/sign-in```
+```/auth/signIn```
 #### Method
 ```POST```
 #### Body example
@@ -84,7 +85,7 @@ https://github.com/meg4cyberc4t/megasdkdart
 ---
 ### Метод перезагрузки токенов: 
 #### Path
-```/auth/reload-token```
+```/auth/reloadToken```
 #### Method
 ```POST```
 #### Body example
@@ -99,6 +100,18 @@ https://github.com/meg4cyberc4t/megasdkdart
   "id": 12345678,
   "auth_token": "yourauthtoken",
   "refresh_token":  "yourrefreshtoken"    
+}
+```
+---
+### Метод перезагрузки токенов: 
+#### Path
+```/auth/checkCorrectLogin```
+#### Method
+```POST```
+#### Body example
+```json
+{
+  "login": "yourtestlogin"
 }
 ```
 ---

@@ -11,16 +11,23 @@ class UsersRepository {
 
   Future<int> _generateId() async {
     int id = Random().nextInt(2147483647);
-    while (!await _isUniqueId(id)) {
+    while (!await isUniqueId(id)) {
       id = Random().nextInt(2147483647);
     }
     return id;
   }
 
-  Future<bool> _isUniqueId(int id) async {
+  Future<bool> isUniqueId(int id) async {
     var data = await __executor.query(
         "SELECT * FROM  $__tableName WHERE id = @1",
         substitutionValues: {'1': id});
+    return data.isEmpty ? true : data[0].isEmpty;
+  }
+
+  Future<bool> isUniqueLogin(String login) async {
+    var data = await __executor.query(
+        "SELECT * FROM  $__tableName WHERE login = @1",
+        substitutionValues: {'1': login});
     return data.isEmpty ? true : data[0].isEmpty;
   }
 

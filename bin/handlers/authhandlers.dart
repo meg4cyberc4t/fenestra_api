@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../extensions/check_correct_login.dart';
 import '../extensions/jwtmethods.dart';
 import '../repository/repository.dart';
 
@@ -17,7 +18,7 @@ class AuthHandlers {
   Router get router {
     final router = Router();
 
-    router.post('/sign-up', (Request request) async {
+    router.post('/signUp', (Request request) async {
       var input = jsonDecode(await request.readAsString());
       UserStruct selectUser = UserStruct(
         id: null,
@@ -44,7 +45,7 @@ class AuthHandlers {
       }));
     });
 
-    router.post('/sign-in', (Request request) async {
+    router.post('/signIn', (Request request) async {
       dynamic input = jsonDecode(await request.readAsString());
       int id = await repos.users.getIdFromLoginPassword(input['login'],
           md5.convert(utf8.encode(input['password'])).toString());
@@ -63,7 +64,7 @@ class AuthHandlers {
       }));
     });
 
-    router.post('/reload-token', (Request request) async {
+    router.post('/reloadToken', (Request request) async {
       dynamic input = jsonDecode(await request.readAsString());
       RefreshTokenStruct refreshToken =
           await repos.refreshTokens.get(input['refresh_token']);
@@ -76,6 +77,18 @@ class AuthHandlers {
         'auth_token': authToken,
         'refresh_token': refreshToken.token
       }));
+    });
+
+    router.post('/checkCorrectLogin', (Request request) async {
+      dynamic input = jsonDecode(await request.readAsString());
+      String login = input['login'];
+      if (!checkCorrectLogin(login)) {
+        return Response(403);
+      }
+      if (!await repos.users.isUniqueLogin(login)) {
+        return Response(422);
+      }
+      return Response(202);
     });
 
     router.all(
