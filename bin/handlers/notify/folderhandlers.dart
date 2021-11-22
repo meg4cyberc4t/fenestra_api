@@ -38,7 +38,6 @@ class FolderHandlers {
           description: input['description'],
           priority: input['priority'] ?? 0,
           id: null,
-          participants: <int>[],
           owner: request.context['id'] as int);
 
       await repos.notify.folders.add(folder);
@@ -68,9 +67,6 @@ class FolderHandlers {
       if (input['description'] != null) {
         selectFolder.description = input['description'];
       }
-      if (input['participants'] != null) {
-        selectFolder.participants = input['participants'];
-      }
       if (input['priority'] != null) {
         selectFolder.priority = input['priority'];
       }
@@ -78,7 +74,7 @@ class FolderHandlers {
       return Response.ok(jsonEncode(selectFolder.toMap()));
     });
 
-    router.post('/<id>/invite', (Request request, String id) async {
+    router.post('/<id>/relation', (Request request, String id) async {
       int folderId = int.parse(id);
       UserStruct ownerUser =
           await repos.users.getFromId(request.context['id'] as int);
@@ -86,22 +82,10 @@ class FolderHandlers {
           await repos.notify.folders.getById(ownerUser, folderId);
       dynamic input = jsonDecode(await request.readAsString());
       UserStruct inviteUser = await repos.users.getFromId(input['id']);
-      if (!selectFolder.participants.contains(inviteUser.id)) {
+      if (!await repos.notify.folders.isParticipant(inviteUser, selectFolder)) {
         await repos.notify.folders.invite(inviteUser, selectFolder);
-      }
-      return Response(201);
-    });
-
-    router.post('/<id>/exclude', (Request request, String id) async {
-      int folderId = int.parse(id);
-      UserStruct ownerUser =
-          await repos.users.getFromId(request.context['id'] as int);
-      FolderStruct selectFolder =
-          await repos.notify.folders.getById(ownerUser, folderId);
-      dynamic input = jsonDecode(await request.readAsString());
-      UserStruct excludeUser = await repos.users.getFromId(input['id']);
-      if (selectFolder.participants.contains(excludeUser.id)) {
-        await repos.notify.folders.exclude(excludeUser, selectFolder);
+      } else {
+        await repos.notify.folders.exclude(inviteUser, selectFolder);
       }
       return Response(201);
     });

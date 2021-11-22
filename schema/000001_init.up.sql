@@ -74,5 +74,6 @@ CREATE TABLE "notify_notifications_participants" (
 	"user" integer NOT NULL
 );
 
+
 ALTER TABLE "notify_notifications_participants" ADD CONSTRAINT "notify_notifications_participants_fk0" FOREIGN KEY ("notification") REFERENCES "notify_notifications"("id");
 ALTER TABLE "notify_notifications_participants" ADD CONSTRAINT "notify_notifications_participants_fk1" FOREIGN KEY ("user") REFERENCES "users"("id");

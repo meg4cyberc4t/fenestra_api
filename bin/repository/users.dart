@@ -34,8 +34,8 @@ class UsersRepository {
   Future<void> add(UserStruct user) async {
     user.id = await _generateId();
     var rows = await __executor.query(
-        "INSERT INTO $__tableName (id, first_name, last_name, login, password_hash, colleagues, subscribers, color)"
-        " VALUES (@1, @2, @3, @4, @5, ARRAY${user.colleagues}::integer[], ARRAY${user.subscribers}::integer[], @6) RETURNING id",
+        "INSERT INTO $__tableName (id, first_name, last_name, login, password_hash, color)"
+        " VALUES (@1, @2, @3, @4, @5, @6) RETURNING id",
         substitutionValues: {
           '1': user.id,
           '2': user.firstName,
@@ -64,10 +64,7 @@ class UsersRepository {
       lastName: data[0][2],
       login: data[0][3],
       passwordHash: data[0][4],
-      colleagues: data[0][5],
-      subscribers: data[0][6],
-      subscriptions: data[0][7],
-      color: data[0][8],
+      color: data[0][5],
     );
   }
 
@@ -86,79 +83,148 @@ class UsersRepository {
         });
   }
 
-  Future<void> addBond(UserStruct user, UserStruct bondUser) async {
-    await __executor.query(
-        "UPDATE $__tableName "
-        "SET colleagues = array_append(colleagues, @2)"
-        "WHERE id = @1",
+  Future<bool> isCollegues(UserStruct firstUser, UserStruct secondUser) async {
+    var data = await __executor.query(
+        "SELECT * FROM bonds_collegues "
+        "WHERE (user1 = @1 AND user2 = @2) OR  (user2 = @1 AND user1 = @2)",
         substitutionValues: {
-          '1': user.id,
-          '2': bondUser.id,
+          '1': firstUser.id,
+          '2': secondUser.id,
         });
+    return data.isEmpty ? false : data[0].isNotEmpty;
+  }
+
+  Future<void> setCollegues(UserStruct firstUser, UserStruct secondUser) async {
     await __executor.query(
-        "UPDATE $__tableName "
-        "SET colleagues = array_append(colleagues, @1)"
-        "WHERE id = @2",
+        "INSERT INTO bonds_collegues(user1, user2) VALUES (@1, @2)",
         substitutionValues: {
-          '1': user.id,
-          '2': bondUser.id,
+          '1': firstUser.id,
+          '2': secondUser.id,
         });
   }
 
-  Future<void> deleteBond(UserStruct user, UserStruct bondUser) async {
+  Future<void> deleteCollegues(
+      UserStruct firstUser, UserStruct secondUser) async {
     await __executor.query(
-        "UPDATE $__tableName "
-        "SET colleagues = array_remove(colleagues, @2)"
-        "WHERE id = @1",
+        "DELETE FROM bonds_collegues(user1, user2) "
+        "WHERE (user1 = @1 AND user2 = @2) OR  (user2 = @1 AND user1 = @2",
         substitutionValues: {
-          '1': user.id,
-          '2': bondUser.id,
-        });
-    await __executor.query(
-        "UPDATE $__tableName "
-        "SET colleagues = array_remove(colleagues, @1)"
-        "WHERE id = @2",
-        substitutionValues: {
-          '1': user.id,
-          '2': bondUser.id,
+          '1': firstUser.id,
+          '2': secondUser.id,
         });
   }
 
-  Future<void> addSubscriptions(UserStruct user, UserStruct bondUser) async {
-    await __executor.query(
-        "UPDATE $__tableName "
-        "SET subscriptions = array_append(subscriptions, @2)"
-        "WHERE id = @1",
+  Future<bool> isSubscribe(UserStruct user1, UserStruct user2) async {
+    var data = await __executor.query(
+        "SELECT * FROM bonds_subscriptions "
+        "WHERE (from = @1 AND to = @2)",
         substitutionValues: {
-          '1': user.id,
-          '2': bondUser.id,
+          '1': user1.id,
+          '2': user2.id,
         });
+    return data.isEmpty ? false : data[0].isNotEmpty;
+  }
+
+  Future<void> setSubscribe(UserStruct from, UserStruct to) async {
     await __executor.query(
-        "UPDATE $__tableName "
-        "SET subscribers = array_append(subscribers, @1)"
-        "WHERE id = @2",
+        "INSERT INTO bonds_subscriptions(from, to) VALUES (@1, @2)",
         substitutionValues: {
-          '1': user.id,
-          '2': bondUser.id,
+          '1': from.id,
+          '2': to.id,
         });
   }
 
-  Future<void> deleteSubscriptions(UserStruct user, UserStruct bondUser) async {
-    await __executor.query(
-        "UPDATE $__tableName "
-        "SET subscriptions = array_remove(subscriptions, @2)"
-        "WHERE id = @1",
+  Future<bool> deleteSubscribe(UserStruct user1, UserStruct user2) async {
+    var data = await __executor.query(
+        "DELETE FROM bonds_subscriptions "
+        "WHERE (from = @1 AND to = @2)",
         substitutionValues: {
-          '1': user.id,
-          '2': bondUser.id,
+          '1': user1.id,
+          '2': user2.id,
         });
-    await __executor.query(
-        "UPDATE $__tableName "
-        "SET subscribers = array_remove(subscribers, @1)"
-        "WHERE id = @2",
-        substitutionValues: {
-          '1': user.id,
-          '2': bondUser.id,
-        });
+    return data.isEmpty ? false : data[0].isNotEmpty;
   }
+
+  // Future<void> bond(UserStruct user, UserStruct bondUser) async {
+  //   // Если оба есть в коллегах
+
+  //   // Если один подписан на второго
+
+  //   // Если второй подписан на первого
+
+  //   // Если никто не подписан
+  //   await __executor.query(
+  //       "UPDATE $__tableName "
+  //       "SET colleagues = array_append(colleagues, @2)"
+  //       "WHERE id = @1",
+  //       substitutionValues: {
+  //         '1': user.id,
+  //         '2': bondUser.id,
+  //       });
+  //   await __executor.query(
+  //       "UPDATE $__tableName "
+  //       "SET colleagues = array_append(colleagues, @1)"
+  //       "WHERE id = @2",
+  //       substitutionValues: {
+  //         '1': user.id,
+  //         '2': bondUser.id,
+  //       });
+  // }
+
+  // Future<void> deleteBond(UserStruct user, UserStruct bondUser) async {
+  //   await __executor.query(
+  //       "UPDATE $__tableName "
+  //       "SET colleagues = array_remove(colleagues, @2)"
+  //       "WHERE id = @1",
+  //       substitutionValues: {
+  //         '1': user.id,
+  //         '2': bondUser.id,
+  //       });
+  //   await __executor.query(
+  //       "UPDATE $__tableName "
+  //       "SET colleagues = array_remove(colleagues, @1)"
+  //       "WHERE id = @2",
+  //       substitutionValues: {
+  //         '1': user.id,
+  //         '2': bondUser.id,
+  //       });
+  // }
+
+  // Future<void> addSubscriptions(UserStruct user, UserStruct bondUser) async {
+  //   await __executor.query(
+  //       "UPDATE $__tableName "
+  //       "SET subscriptions = array_append(subscriptions, @2)"
+  //       "WHERE id = @1",
+  //       substitutionValues: {
+  //         '1': user.id,
+  //         '2': bondUser.id,
+  //       });
+  //   await __executor.query(
+  //       "UPDATE $__tableName "
+  //       "SET subscribers = array_append(subscribers, @1)"
+  //       "WHERE id = @2",
+  //       substitutionValues: {
+  //         '1': user.id,
+  //         '2': bondUser.id,
+  //       });
+  // }
+
+  // Future<void> deleteSubscriptions(UserStruct user, UserStruct bondUser) async {
+  //   await __executor.query(
+  //       "UPDATE $__tableName "
+  //       "SET subscriptions = array_remove(subscriptions, @2)"
+  //       "WHERE id = @1",
+  //       substitutionValues: {
+  //         '1': user.id,
+  //         '2': bondUser.id,
+  //       });
+  //   await __executor.query(
+  //       "UPDATE $__tableName "
+  //       "SET subscribers = array_remove(subscribers, @1)"
+  //       "WHERE id = @2",
+  //       substitutionValues: {
+  //         '1': user.id,
+  //         '2': bondUser.id,
+  //       });
+  // }
 }

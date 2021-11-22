@@ -2,7 +2,6 @@ class FolderStruct {
   FolderStruct({
     required this.id,
     required this.owner,
-    required this.participants,
     required this.title,
     required this.description,
     required this.priority,
@@ -10,7 +9,6 @@ class FolderStruct {
 
   FolderStruct.fromJson(Map<String, dynamic> json) {
     owner = json['owner'];
-    participants = json['participants'];
     title = json['title'];
     description = json['description'];
     priority = json['priority'];
@@ -20,7 +18,6 @@ class FolderStruct {
   late int owner;
   late String title;
   late String? description;
-  late List<int> participants;
   late int priority;
 
   Map toMap() => {
@@ -28,7 +25,6 @@ class FolderStruct {
         'owner': owner,
         'title': title,
         'description': description,
-        'participants': participants,
         'priority': priority,
       };
 }

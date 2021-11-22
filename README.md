@@ -124,9 +124,6 @@ Mega представляет из себя единую систему авто
   String lastName; // Фамилия пользователя
   String login; // Логин (Уникальное значение)
   int color; // Цвет пользователя
-  List<int> colleagues; // Список коллег пользователя
-  List<int> subscribers;  // Список подписчиков пользователя 
-  List<int> subscriptions; // Список подписок пользователя
 ```
 ! Пользователи становятся коллегами, только когда взаимноподпишутся !
 
@@ -142,9 +139,6 @@ Mega представляет из себя единую систему авто
   "first_name": "yourfirstname",
   "last_name": "yourlastname",
   "login": "login",
-  "colleagues": [2, 4, 5],
-  "subscribers": [6, 7, 8],
-  "subscriptions": [9, 10, 11],
   "color": 0
 }
 ```
@@ -191,9 +185,6 @@ Mega представляет из себя единую систему авто
   "first_name": "yournewfirstname",
   "last_name": "yournewlastname",
   "login": "yournewlogin",
-  "colleagues": [2, 4, 5],
-  "subscribers": [6, 7, 8],
-  "subscriptions": [9, 10, 11],
   "color": 2
 }
 ```
@@ -224,7 +215,6 @@ int owner; // id создателя напомнания
 int? deadline; // Время дедлайна в timestamp (milliseconds after epoch, может быть null)
 int? repeat; // Повторяется ли напоминание (число 0 до 127 включительно, может быть null)
 int? folder;  // id папки напоминаний (Может быть null)
-List<int> invited; // Список пользователей, с которыми поделились напоминанием
 ```
 ---
 ### Метод создания нового напоминания:
@@ -284,7 +274,6 @@ List<int> invited; // Список пользователей, с которым
         "deadline": null,
         "repeat": null,
         "folder": null,
-        "invited": []
     },
 ]
 ```
@@ -305,7 +294,6 @@ List<int> invited; // Список пользователей, с которым
         "deadline": null,
         "repeat": null,
         "folder": null,
-        "invited": []
     },
 ]
 ```
@@ -335,7 +323,6 @@ List<int> invited; // Список пользователей, с которым
     "deadline": 1637154816,
     "repeat": 124,
     "folder": null,
-    "invited": []
 }
 ```
 ---
@@ -363,7 +350,6 @@ int? id; // id папки (уникальное значение)
 int owner; // id создателя папки
 String title; // Название папки
 String? description; // Описание папки
-List<int> participants; // Список участников папки (без создателя)
 int priority; // Приоритет папки (число от 1 до 3)
 ```
 ---
@@ -399,7 +385,6 @@ int priority; // Приоритет папки (число от 1 до 3)
     "owner": 484911188,
     "title": "title",
     "description": "desc",
-    "participants": [],
     "priority": 0
 }
 ```
@@ -424,7 +409,6 @@ int priority; // Приоритет папки (число от 1 до 3)
     "owner": 484911188,
     "title": "title",
     "description": "desc",
-    "participants": [],
     "priority": 1
 }
 ```
@@ -435,21 +419,9 @@ int priority; // Приоритет папки (число от 1 до 3)
 #### Method
 ```DELETE```
 ---
-### Метод для того, чтоб пригласить пользователя в папку:
+### Метод для того, чтоб пригласить пользователя в папку или удалить из неё:
 #### Path
-```/notify/folders/1/invite```
-#### Method
-```POST```
-#### Body example
-```json
-{
-  "id": 12345678
-}
-```
----
-### Метод для того, чтоб пригласить пользователя в папку:
-#### Path
-```/notify/folders/1/exclude```
+```/notify/folders/1/relation```
 #### Method
 ```POST```
 #### Body example

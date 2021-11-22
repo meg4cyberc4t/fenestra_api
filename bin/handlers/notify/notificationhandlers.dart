@@ -53,7 +53,6 @@ class NotificationsHandlers {
         deadline: input['deadline'],
         repeat: input['repeat'],
         folder: input['folder'],
-        invited: input['invited'] ?? [],
         id: null,
       );
       await repos.notify.notifications.add(notification);
@@ -107,10 +106,13 @@ class NotificationsHandlers {
           await repos.notify.notifications.getById(ownerUser, notificationId);
       dynamic input = jsonDecode(await request.readAsString());
       UserStruct inviteUser = await repos.users.getFromId(input['id']);
-      if (!selectNotification.invited.contains(inviteUser.id)) {
-        await repos.notify.notifications.invite(selectNotification, inviteUser);
+      if (!await repos.notify.notifications
+          .isParticipant(inviteUser, selectNotification)) {
+        await repos.notify.notifications.invite(inviteUser, selectNotification);
+      } else {
+        await repos.notify.notifications
+            .exclude(inviteUser, selectNotification);
       }
-
       return Response(201);
     });
 

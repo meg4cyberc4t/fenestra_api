@@ -60,7 +60,6 @@ class NotificationsRepository {
           deadline: e[4],
           repeat: e[5],
           folder: e[6],
-          invited: e[7],
         ),
       );
     }
@@ -79,7 +78,6 @@ class NotificationsRepository {
       deadline: rows[0][4],
       repeat: rows[0][5],
       folder: rows[0][6],
-      invited: rows[0][7],
     );
   }
 
@@ -98,7 +96,6 @@ class NotificationsRepository {
           deadline: e[4],
           repeat: e[5],
           folder: e[6],
-          invited: e[7],
         ),
       );
     }
@@ -122,23 +119,34 @@ class NotificationsRepository {
         });
   }
 
-  Future<void> delete(UserStruct user, NotificationStruct folder) async {
+  Future<void> invite(UserStruct user, NotificationStruct notification) async {
     await __executor.query(
-        "DELETE FROM $__tableName WHERE id = @1 AND owner = @2",
+        "INSERT INTO notify_notifications_participants (notification, user)"
+        "VALUES (@2, @1)",
         substitutionValues: {
-          '1': folder.id,
-          '2': user.id,
+          '1': user.id,
+          '2': notification.id,
         });
   }
 
-  Future<void> invite(NotificationStruct folder, UserStruct user) async {
+  Future<void> exclude(UserStruct user, NotificationStruct notification) async {
     await __executor.query(
-        "UPDATE $__tableName "
-        "SET invited = array_append(invited, @1)"
-        "WHERE id = @2",
+        "DELETE FROM notify_notifications_participants "
+        "WHERE notification = @2 AND user = @1",
         substitutionValues: {
           '1': user.id,
-          '2': folder.id,
+          '2': notification.id,
         });
+  }
+
+  Future<bool> isParticipant(
+      UserStruct user, NotificationStruct notification) async {
+    var data = await __executor.query(
+        "SELECT * FROM notify_notifications_participants WHERE user = @1 AND notification = @2",
+        substitutionValues: {
+          '1': user.id,
+          '2': notification.id,
+        });
+    return data.isEmpty ? true : data[0].isEmpty;
   }
 }
