@@ -10,7 +10,7 @@ CREATE TABLE "users" (
 CREATE TABLE "bonds_collegues" (
 	"id" integer UNIQUE PRIMARY KEY,
 	"user1" integer NOT NULL,
-	"user2" integer NOT NULL,
+	"user2" integer NOT NULL
 );
 
 ALTER TABLE "bonds_collegues" ADD CONSTRAINT "bonds_collegues_fk0" FOREIGN KEY ("user1") REFERENCES "users"("id");
@@ -20,7 +20,7 @@ ALTER TABLE "bonds_collegues" ADD CONSTRAINT "bonds_collegues_fk1" FOREIGN KEY (
 CREATE TABLE "bonds_subscriptions" (
 	"id" integer UNIQUE PRIMARY KEY,
 	"from" integer NOT NULL,
-	"to" integer NOT NULL,
+	"to" integer NOT NULL
 );
 
 ALTER TABLE "bonds_subscriptions" ADD CONSTRAINT "bonds_subscriptions_fk0" FOREIGN KEY ("from") REFERENCES "users"("id");
