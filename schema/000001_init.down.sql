@@ -15,7 +15,7 @@ ALTER TABLE "notify_folders_participants" DROP CONSTRAINT notify_folders_partici
 ALTER TABLE "notify_folders_participants" DROP CONSTRAINT notify_folders_participants_fk1;
 
 ALTER TABLE "notify_notifications_participants" DROP CONSTRAINT notify_notifications_participants_fk0;
-ALTER TABLE "notify_notifications_participants" DROP CONSTRAINT notify_notifications_participants_fk1S;
+ALTER TABLE "notify_notifications_participants" DROP CONSTRAINT notify_notifications_participants_fk1;
 
 DROP TABLE "users";
 
