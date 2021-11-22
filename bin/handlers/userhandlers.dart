@@ -57,7 +57,7 @@ class UserHandlers {
       return Response.ok(jsonEncode(selectUser.toMap()));
     });
 
-    router.get('/<id>/bond', (Request request, String id) async {
+    router.get('/<id>/relation', (Request request, String id) async {
       int subjectId = int.parse(id);
       UserStruct subjUser = await repos.users.getFromId(subjectId);
       UserStruct selectUser =

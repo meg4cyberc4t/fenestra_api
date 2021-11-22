@@ -98,7 +98,7 @@ class NotificationsHandlers {
       return Response.ok(jsonEncode(selectNotification.toMap()));
     });
 
-    router.post('/<id>/invite', (Request request, String id) async {
+    router.post('/<id>/relation', (Request request, String id) async {
       int notificationId = int.parse(id);
       UserStruct ownerUser =
           await repos.users.getFromId(request.context['id'] as int);
