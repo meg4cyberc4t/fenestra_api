@@ -1,5 +1,5 @@
 bool checkCorrectLogin(String login) {
-  if (login.length < 6) {
+  if (login.length < 3) {
     return false;
   }
   if (int.tryParse(login) != null) {
@@ -8,13 +8,9 @@ bool checkCorrectLogin(String login) {
   if (login.contains(' ')) {
     return false;
   }
-  for (var item in [
-    "password",
-    "qwerty",
-  ]) {
-    if (login == item) {
-      return false;
-    }
+  if (["password", "qwerty"].contains(login)) {
+    return false;
   }
+
   return true;
 }
