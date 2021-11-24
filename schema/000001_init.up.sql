@@ -4,7 +4,7 @@ CREATE TABLE "users" (
 	"last_name" varchar NOT NULL,
 	"login" varchar NOT NULL UNIQUE,
 	"password_hash" varchar NOT NULL,
-	"color" integer NOT NULL CHECK(color >=0 AND color <= 4294967295)
+	"color" bigint NOT NULL CHECK(color >=0 AND color <= 4294967295)
 );
 
 CREATE TABLE "bonds_collegues" (
