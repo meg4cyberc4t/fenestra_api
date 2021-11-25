@@ -1,4 +1,4 @@
-# mega_api
+# fenestra_api
 
 ## Информация для разработчиков
 
@@ -15,7 +15,7 @@
 - ```make log``` (Красивый git log)
 
 ### Вы можете использовать официальную SDK для своих проектов
-https://github.com/meg4cyberc4t/megasdkdart
+https://github.com/meg4cyberc4t/fenestra_sdk_dart
 
 ### Документация
 

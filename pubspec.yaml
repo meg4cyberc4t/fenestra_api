@@ -1,7 +1,7 @@
-name: notifyapi
-description: RESTful API server written in dart. Works with JWT and Postgres. Implemented for synchronization of clients in the Notify project
+name: fenestra_api
+description: RESTful API server written in dart. Works with JWT and Postgres. Implemented for synchronization of clients in the Fenestra projects
 version: 1.0.0
-homepage: https://github.com/meg4cyberc4t/notify-api
+homepage: https://github.com/meg4cyberc4t/fenestra_api
 
 environment:
   sdk: '>=2.14.0-168.0.dev <3.0.0'
