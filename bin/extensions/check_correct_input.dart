@@ -1,6 +1,6 @@
 import 'have_digit.dart';
 
-bool checkCorrectLogin(String value) {
+bool checkCorrectInput(String value) {
   if (value.isEmpty) {
     return false;
   } else if (haveDigit(value)) {

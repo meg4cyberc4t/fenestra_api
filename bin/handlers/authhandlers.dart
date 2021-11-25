@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import '../extensions/check_correct_input.dart';
 import '../extensions/check_correct_login.dart';
+import '../extensions/check_correct_password.dart';
 import '../extensions/jwtmethods.dart';
 import '../repository/repository.dart';
 
@@ -20,7 +22,16 @@ class AuthHandlers {
 
     router.post('/signUp', (Request request) async {
       var input = jsonDecode(await request.readAsString());
+      if (!checkCorrectInput(input['first_name'])) {
+        return Response(403);
+      }
+      if (!checkCorrectInput(input['last_name'])) {
+        return Response(403);
+      }
       if (!checkCorrectLogin(input['login'])) {
+        return Response(403);
+      }
+      if (!checkCorrectPassword(input['password'])) {
         return Response(403);
       }
       UserStruct selectUser = UserStruct(
