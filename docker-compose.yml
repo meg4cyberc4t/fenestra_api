@@ -10,6 +10,9 @@ services:
       - db
     environment:
       - DB_PASSWORD=SUPERPASSWORD
+    networks:
+      localnet:
+        ipv4_address: 10.10.10.2
 
 
   db:
@@ -23,3 +26,14 @@ services:
       - "5432"
     ports:
       - 5432:5432
+    networks:
+      localnet:
+        ipv4_address: 10.10.10.3
+
+networks:
+  localnet:
+    driver: bridge
+    ipam: 
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1
