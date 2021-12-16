@@ -50,7 +50,7 @@ class Service {
   }
 }
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
   loadEnv();
   Map serverConfig = await loadYamlFile('bin/configs/config.yml');
   PostgreSQLConnection connection = PostgreSQLConnection(
@@ -61,7 +61,7 @@ Future<void> main() async {
     password: env['DBPASSWORD'],
     useSSL: serverConfig['database']['useSSL'],
   );
-  await connection.open();
+  // await connection.open();
   Repository repos = Repository(connection);
   Service service = Service(repos, serverConfig['server']['secretServerKey']);
   final server = await shelf_io.serve(

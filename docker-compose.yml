@@ -1,6 +1,17 @@
 version: '3.5'
 
 services:
+  mega_api:
+    build: ./
+    command: ./wait-for-postgres.sh db ./bin/main.exe
+    ports:
+      - 80:80
+    depends_on:
+      - db
+    environment:
+      - DB_PASSWORD=SUPERPASSWORD
+
+
   db:
     restart: always
     image: postgres:latest
@@ -8,5 +19,7 @@ services:
     - ./.database/postgres/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=SUPERPASSWORD
+    expose:
+      - "5432"
     ports:
       - 5432:5432

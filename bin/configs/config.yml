@@ -4,7 +4,7 @@ server:
   secretServerKey: ALOHAMORA
 
 database: 
-  host: localhost
+  host: "::"
   port: 5432
   databaseName: postgres
   username: postgres
